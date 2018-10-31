@@ -31,6 +31,7 @@ from dialognewdriver import DialogNewDriver
 from dialogpreferences import DialogPreferences
 from dialogipapprogram import DialogIcepapProgram
 from ipapconsole import IcepapConsole
+from oscillawindow import OscillaWindow
 from messagedialogs import MessageDialogs
 from templatescatalogwidget import TemplatesCatalogWidget
 #from dialoghistoriccfg import DialogHistoricCfg
@@ -129,7 +130,8 @@ class IcepapCMS(QtGui.QMainWindow):
         QtCore.QObject.connect(self.ui.actionExport,QtCore.SIGNAL("triggered()"),self.actionExport)         
         QtCore.QObject.connect(self.ui.actionImport,QtCore.SIGNAL("triggered()"),self.actionImport)         
         QtCore.QObject.connect(self.ui.actionConsole,QtCore.SIGNAL("triggered()"),self.actionConsole)         
-        QtCore.QObject.connect(self.ui.actionFirmwareUpgrade,QtCore.SIGNAL("triggered()"),self.actionFimwareUpgrade)         
+        QtCore.QObject.connect(self.ui.actionOscilla,QtCore.SIGNAL("triggered()"),self.actionOscilla)
+        QtCore.QObject.connect(self.ui.actionFirmwareUpgrade,QtCore.SIGNAL("triggered()"),self.actionFimwareUpgrade)
         QtCore.QObject.connect(self.ui.actionSaveConfig,QtCore.SIGNAL("triggered()"),self.actionSaveConfig)
         QtCore.QObject.connect(self.ui.actionHistoricCfg,QtCore.SIGNAL("triggered()"),self.actionHistoricCfg)
         #QtCore.QObject.connect(self.ui.actionSetExpertFlag,QtCore.SIGNAL("triggered()"),self.actionSetExpertFlag)
@@ -949,13 +951,18 @@ class IcepapCMS(QtGui.QMainWindow):
     def actionExport(self): 
         if self.ui.stackedWidget.currentIndex() == 3:
             self.ui.pageiPapDriver.doExport()
-    
+
     def actionConsole(self):
         dlg = IcepapConsole(self)
         #dlg.exec_()
         #dlg = IcepapConsole()
         dlg.show()
-        
+
+    def actionOscilla(self):
+        pass
+        #oscilla_window = OscillaWindow(host, port)
+        #oscilla_window.show()
+
     def actionPreferences(self):
         dlg = DialogPreferences(self)
         dlg.exec_()

@@ -5,5 +5,6 @@ from conflict import Conflict
 from configmanager import ConfigManager
 from timer import Timer
 from icepapcontroller import *
+from oscillacollector import Collector
 from pyIcePAP import *
 from IPy import *

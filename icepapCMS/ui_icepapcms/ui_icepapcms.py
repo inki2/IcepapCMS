@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'icepapcms.ui'
 #
-# Created: Fri Feb  9 13:20:39 2018
+# Created: Wed Oct 31 15:44:25 2018
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -80,7 +80,7 @@ class Ui_IcepapCMS(object):
         self.vboxlayout.addWidget(self.stackedWidget)
         IcepapCMS.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(IcepapCMS)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1200, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1200, 20))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName(_fromUtf8("menuHelp"))
@@ -121,8 +121,8 @@ class Ui_IcepapCMS(object):
         self.frame = QtGui.QFrame(self.dockWidgetContents)
         self.frame.setObjectName(_fromUtf8("frame"))
         self.gridLayout = QtGui.QGridLayout(self.frame)
-        self.gridLayout.setMargin(2)
         self.gridLayout.setSpacing(2)
+        self.gridLayout.setMargin(2)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
@@ -293,6 +293,11 @@ class Ui_IcepapCMS(object):
         self.actionCopy.setObjectName(_fromUtf8("actionCopy"))
         self.actionPaste = QtGui.QAction(IcepapCMS)
         self.actionPaste.setObjectName(_fromUtf8("actionPaste"))
+        self.actionOscilloscope = QtGui.QAction(IcepapCMS)
+        icon19 = QtGui.QIcon()
+        icon19.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/IcepapCfg Icons/gnome-monitor.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionOscilloscope.setIcon(icon19)
+        self.actionOscilloscope.setObjectName(_fromUtf8("actionOscilloscope"))
         self.menuHelp.addAction(self.actionUser_manual)
         self.menuHelp.addAction(self.actionHardware_manual)
         self.menuHelp.addAction(self.actionHelp)
@@ -319,6 +324,7 @@ class Ui_IcepapCMS(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionFirmwareUpgrade)
         self.menuFile.addAction(self.actionConsole)
+        self.menuFile.addAction(self.actionOscilloscope)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionPreferences)
         self.menuFile.addAction(self.actionQuit)
@@ -339,6 +345,7 @@ class Ui_IcepapCMS(object):
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionPreferences)
         self.toolBar.addAction(self.actionConsole)
+        self.toolBar.addAction(self.actionOscilloscope)
         self.toolBar.addAction(self.actionHelp)
         self.toolBar.addAction(self.actionQuit)
 
@@ -417,5 +424,8 @@ class Ui_IcepapCMS(object):
         self.actionCopy.setShortcut(_translate("IcepapCMS", "Ctrl+C", None))
         self.actionPaste.setText(_translate("IcepapCMS", "Paste configuration", None))
         self.actionPaste.setShortcut(_translate("IcepapCMS", "Ctrl+V", None))
+        self.actionOscilloscope.setText(_translate("IcepapCMS", "Oscilloscope", None))
+        self.actionOscilloscope.setToolTip(_translate("IcepapCMS", "Icepap Oscilloscope", None))
+        self.actionOscilloscope.setShortcut(_translate("IcepapCMS", "Ctrl+O", None))
 
 import icepapcms_rc
