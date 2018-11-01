@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'icepapcms.ui'
 #
-# Created: Wed Oct 31 15:44:25 2018
+# Created: Thu Nov  1 13:34:35 2018
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!

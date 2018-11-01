@@ -1,5 +1,5 @@
 MANIFEST
-/dist
+/src/dist
 *.pyc
 /build/
 icepapCMS.egg-info/

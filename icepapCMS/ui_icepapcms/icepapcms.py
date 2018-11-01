@@ -130,7 +130,7 @@ class IcepapCMS(QtGui.QMainWindow):
         QtCore.QObject.connect(self.ui.actionExport,QtCore.SIGNAL("triggered()"),self.actionExport)         
         QtCore.QObject.connect(self.ui.actionImport,QtCore.SIGNAL("triggered()"),self.actionImport)         
         QtCore.QObject.connect(self.ui.actionConsole,QtCore.SIGNAL("triggered()"),self.actionConsole)         
-        QtCore.QObject.connect(self.ui.actionOscilla,QtCore.SIGNAL("triggered()"),self.actionOscilla)
+        self.ui.actionOscilloscope.triggered.connect(self.actionOscilla)
         QtCore.QObject.connect(self.ui.actionFirmwareUpgrade,QtCore.SIGNAL("triggered()"),self.actionFimwareUpgrade)
         QtCore.QObject.connect(self.ui.actionSaveConfig,QtCore.SIGNAL("triggered()"),self.actionSaveConfig)
         QtCore.QObject.connect(self.ui.actionHistoricCfg,QtCore.SIGNAL("triggered()"),self.actionHistoricCfg)
@@ -855,7 +855,7 @@ class IcepapCMS(QtGui.QMainWindow):
         
     def clearLocationBar(self):
         self.ui.stackedWidget.setCurrentIndex(0)
-        self.currentLocation = 0
+        self.currentLocation = ''
         self.locationsPrevious = []
         self.locationsNext = []
         self.checkGoPreviousActions()
@@ -959,9 +959,24 @@ class IcepapCMS(QtGui.QMainWindow):
         dlg.show()
 
     def actionOscilla(self):
-        pass
-        #oscilla_window = OscillaWindow(host, port)
-        #oscilla_window.show()
+        locations = self.currentLocation.split('/')
+        if len(locations) < 3:
+            selected_host = locations[0]
+            selected_driver = None
+        elif len(locations) == 3:
+            selected_host = locations[0]
+            selected_driver = int(locations[2])
+        else:
+            msg = 'Internal error! currentLocation = {}'.format(self.currentLocation)
+            print(msg)
+            MessageDialogs.showErrorMessage(self, 'Display Oscilloscope', msg)
+            return
+        if selected_host == '':
+            MessageDialogs.showInformationMessage(self, 'Display Oscilloscope', 'Select a host first.')
+            return
+        port = self._manager.getIcepapSystem(selected_host).port
+        oscilla_window = OscillaWindow(selected_host, port, selected_driver)
+        oscilla_window.show()
 
     def actionPreferences(self):
         dlg = DialogPreferences(self)

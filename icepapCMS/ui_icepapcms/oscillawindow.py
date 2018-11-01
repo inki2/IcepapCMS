@@ -7,7 +7,7 @@ except ImportError as ie:
     from PyQt4 import QtCore
     from PyQt4 import Qt
 from ui_oscilla import Ui_OscillaWindow
-from lib_icepapcms.oscillacollector import Collector
+from lib_icepapcms.oscillacollector import Collector  # Todo: Cannot find reference 'oscillacollector' in '__init__.py
 import pyqtgraph as pg
 from collections import namedtuple
 import time
@@ -93,7 +93,7 @@ class CurveItem:
 class OscillaWindow(QtGui.QMainWindow):
     """A dialog for plotting IcePAP signals."""
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, selected_driver = None):
         """
         Initializes an instance of class OscillaWindow.
 
@@ -144,7 +144,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self.view_boxes[0].addItem(self.vertical_line, ignoreBounds=True)
         self.view_boxes[0].addItem(self.label)
 
-        self._fill_combo_box_driver_ids()
+        self._fill_combo_box_driver_ids(selected_driver)
         self._fill_combo_box_signals()
         self._select_axis_1()
         self._update_button_status()
@@ -159,11 +159,14 @@ class OscillaWindow(QtGui.QMainWindow):
 
         self.ticker.start(self.tick_interval)
 
-    def _fill_combo_box_driver_ids(self):
+    def _fill_combo_box_driver_ids(self, selected_driver):
         driver_ids = self.collector.get_available_drivers()
         for driver_id in driver_ids:
             self.ui.cbDrivers.addItem(str(driver_id))
-        self.ui.cbDrivers.setCurrentIndex(0)
+        start_index = 0
+        if selected_driver != None:
+            start_index = self.ui.cbDrivers.findText(str(selected_driver))
+        self.ui.cbDrivers.setCurrentIndex(start_index)
 
     def _fill_combo_box_signals(self):
         sig_items = []
