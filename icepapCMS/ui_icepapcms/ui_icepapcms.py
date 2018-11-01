@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'icepapcms.ui'
 #
-# Created: Thu Nov  1 13:34:35 2018
+# Created: Thu Nov  1 14:28:31 2018
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -127,7 +127,7 @@ class Ui_IcepapCMS(object):
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.label = QtGui.QLabel(self.frame)
-        self.label.setMaximumSize(QtCore.QSize(51, 16777215))
+        self.label.setMaximumSize(QtCore.QSize(80, 16777215))
         self.label.setObjectName(_fromUtf8("label"))
         self.horizontalLayout.addWidget(self.label)
         spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
@@ -294,6 +294,7 @@ class Ui_IcepapCMS(object):
         self.actionPaste = QtGui.QAction(IcepapCMS)
         self.actionPaste.setObjectName(_fromUtf8("actionPaste"))
         self.actionOscilloscope = QtGui.QAction(IcepapCMS)
+        self.actionOscilloscope.setEnabled(True)
         icon19 = QtGui.QIcon()
         icon19.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/IcepapCfg Icons/gnome-monitor.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionOscilloscope.setIcon(icon19)
@@ -361,8 +362,8 @@ class Ui_IcepapCMS(object):
         self.menuFile.setTitle(_translate("IcepapCMS", "File", None))
         self.toolBar.setWindowTitle(_translate("IcepapCMS", "Toolbar", None))
         self.dockTree.setWindowTitle(_translate("IcepapCMS", "Tree Explorer", None))
-        self.label.setText(_translate("IcepapCMS", "Location", None))
-        self.label_2.setText(_translate("IcepapCMS", "Add / Remove Icepap System", None))
+        self.label.setText(_translate("IcepapCMS", "Location:", None))
+        self.label_2.setText(_translate("IcepapCMS", "Add / Remove Icepap System: ", None))
         self.btnTreeRemove.setText(_translate("IcepapCMS", "...", None))
         self.actionAbout.setText(_translate("IcepapCMS", "About", None))
         self.actionTree_Explorer.setText(_translate("IcepapCMS", "Tree Explorer", None))

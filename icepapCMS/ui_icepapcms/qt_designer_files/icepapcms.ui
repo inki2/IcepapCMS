@@ -328,12 +328,12 @@
            <widget class="QLabel" name="label">
             <property name="maximumSize">
              <size>
-              <width>51</width>
+              <width>80</width>
               <height>16777215</height>
              </size>
             </property>
             <property name="text">
-             <string>Location</string>
+             <string>Location:</string>
             </property>
            </widget>
           </item>
@@ -376,7 +376,7 @@
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Add / Remove Icepap System</string>
+             <string>Add / Remove Icepap System: </string>
             </property>
            </widget>
           </item>
@@ -792,6 +792,9 @@
    </property>
   </action>
   <action name="actionOscilloscope">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="icepapcms.qrc">
      <normaloff>:/icons/IcepapCfg Icons/gnome-monitor.png</normaloff>:/icons/IcepapCfg Icons/gnome-monitor.png</iconset>

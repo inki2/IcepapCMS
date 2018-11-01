@@ -93,7 +93,7 @@ class CurveItem:
 class OscillaWindow(QtGui.QMainWindow):
     """A dialog for plotting IcePAP signals."""
 
-    def __init__(self, host, port, selected_driver = None):
+    def __init__(self, host, port, selected_driver=None):
         """
         Initializes an instance of class OscillaWindow.
 
@@ -164,7 +164,7 @@ class OscillaWindow(QtGui.QMainWindow):
         for driver_id in driver_ids:
             self.ui.cbDrivers.addItem(str(driver_id))
         start_index = 0
-        if selected_driver != None:
+        if selected_driver is not None:
             start_index = self.ui.cbDrivers.findText(str(selected_driver))
         self.ui.cbDrivers.setCurrentIndex(start_index)
 
@@ -184,7 +184,8 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.rbAxis3.clicked.connect(self._select_axis_3)
         self.ui.btnAdd.clicked.connect(self._add_button_clicked)
         self.ui.btnShift.clicked.connect(self.shift_button_clicked)
-        self.ui.btnRemove.clicked.connect(self._remove_button_clicked)
+        self.ui.btnRemoveSel.clicked.connect(self._remove_selected_signals)
+        self.ui.btnRemoveAll.clicked.connect(self.remove_all_signals)
         self.ui.btnClearSignal.clicked.connect(self.clear_signal)
         self.ui.btnClearAll.clicked.connect(self.clear_all_signals)
         self.ui.btnCLoop.clicked.connect(self.prepare_closed_loop)
@@ -204,7 +205,8 @@ class OscillaWindow(QtGui.QMainWindow):
     def _update_button_status(self):
         val = self.ui.lvActiveSig.count() == 0
         self.ui.btnShift.setDisabled(val)
-        self.ui.btnRemove.setDisabled(val)
+        self.ui.btnRemoveSel.setDisabled(val)
+        self.ui.btnRemoveAll.setDisabled(val)
         self.ui.btnClearSignal.setDisabled(val)
         self.ui.btnClearAll.setDisabled(val)
 
@@ -314,7 +316,7 @@ class OscillaWindow(QtGui.QMainWindow):
         index = self.ui.lvActiveSig.currentRow()
         self.curve_items[index].start_over = True
 
-    def _remove_button_clicked(self):
+    def _remove_selected_signals(self):
         index = self.ui.lvActiveSig.currentRow()
         ci = self.curve_items[index]
         self.collector.unsubscribe(ci.subscription_id)
