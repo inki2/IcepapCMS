@@ -2,10 +2,7 @@
 
 
 import sys
-try:
-    from PyQt5 import QtGui
-except ImportError as e:
-    from PyQt4 import QtGui
+from PyQt4 import QtGui
 from ui_icepapcms import OscillaWindow
 
 

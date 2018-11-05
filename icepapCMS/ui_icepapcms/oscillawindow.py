@@ -1,11 +1,6 @@
-try:
-    from PyQt5 import QtGui
-    from PyQt5 import QtCore
-    from PyQt5 import Qt
-except ImportError as ie:
-    from PyQt4 import QtGui
-    from PyQt4 import QtCore
-    from PyQt4 import Qt
+from PyQt4 import QtGui
+from PyQt4 import QtCore
+from PyQt4 import Qt
 from ui_oscilla import Ui_OscillaWindow
 from lib_icepapcms.oscillacollector import Collector  # Todo: Cannot find reference 'oscillacollector' in '__init__.py
 import pyqtgraph as pg
@@ -155,7 +150,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self.tick_interval = 1000  # [milliseconds]
 
         self._connect_signals()
-        self.proxy = pg.SignalProxy(self.plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self.mouse_moved)
+        self.proxy = pg.SignalProxy(self.plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self._mouse_moved)
 
         self.ticker.start(self.tick_interval)
 
@@ -183,19 +178,19 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.rbAxis2.clicked.connect(self._select_axis_2)
         self.ui.rbAxis3.clicked.connect(self._select_axis_3)
         self.ui.btnAdd.clicked.connect(self._add_button_clicked)
-        self.ui.btnShift.clicked.connect(self.shift_button_clicked)
+        self.ui.btnShift.clicked.connect(self._shift_button_clicked)
         self.ui.btnRemoveSel.clicked.connect(self._remove_selected_signals)
-        self.ui.btnRemoveAll.clicked.connect(self.remove_all_signals)
-        self.ui.btnClearSignal.clicked.connect(self.clear_signal)
-        self.ui.btnClearAll.clicked.connect(self.clear_all_signals)
-        self.ui.btnCLoop.clicked.connect(self.prepare_closed_loop)
-        self.ui.btnCurrents.clicked.connect(self.prepare_currents)
-        self.ui.btnTarget.clicked.connect(self.prepare_target)
-        self.ui.btnPause.clicked.connect(self.pause_button_clicked)
-        self.ui.btnNow.clicked.connect(self.now_button_clicked)
-        self.view_boxes[0].sigResized.connect(self.update_views)
+        self.ui.btnRemoveAll.clicked.connect(self._remove_all_signals)
+        self.ui.btnClearSignal.clicked.connect(self._clear_signal)
+        self.ui.btnClearAll.clicked.connect(self._clear_all_signals)
+        self.ui.btnCLoop.clicked.connect(self._prepare_closed_loop)
+        self.ui.btnCurrents.clicked.connect(self._prepare_currents)
+        self.ui.btnTarget.clicked.connect(self._prepare_target)
+        self.ui.btnPause.clicked.connect(self._pause_button_clicked)
+        self.ui.btnNow.clicked.connect(self._now_button_clicked)
+        self.view_boxes[0].sigResized.connect(self._update_views)
 
-    def update_views(self):
+    def _update_views(self):
         """Updates the geometry of the view boxes."""
         self.view_boxes[1].setGeometry(self.view_boxes[0].sceneBoundingRect())
         self.view_boxes[2].setGeometry(self.view_boxes[0].sceneBoundingRect())
@@ -241,7 +236,7 @@ class OscillaWindow(QtGui.QMainWindow):
             my_axis = 2
         elif self.ui.rbAxis3.isChecked():
             my_axis = 3
-        self.add_curve(addr, my_signal_name, my_axis)
+        self._add_curve(addr, my_signal_name, my_axis)
 
     def callback_plot(self, subscription_id, value_list):
         for ci in self.curve_items:
@@ -254,7 +249,7 @@ class OscillaWindow(QtGui.QMainWindow):
                     elif v < ci.val_min:
                         ci.val_min = v
 
-    def add_curve(self, driver_addr, signal_name, y_axis):
+    def _add_curve(self, driver_addr, signal_name, y_axis):
         """
         Adds a new curve to the plot area.
 
@@ -271,7 +266,7 @@ class OscillaWindow(QtGui.QMainWindow):
             return
         ci = CurveItem(subscription_id, driver_addr, signal_name, y_axis)
         self.collector.start(subscription_id)
-        self.plot_curve(ci)
+        self._plot_curve(ci)
         self.curve_items.append(ci)
         self.ui.lvActiveSig.addItem(ci.signature)
         index = len(self.curve_items) - 1
@@ -281,20 +276,20 @@ class OscillaWindow(QtGui.QMainWindow):
         self._update_plot_axes_labels()
         self._update_button_status()
 
-    def clear_all_signals(self):
+    def _clear_all_signals(self):
         """Remove the visible data for all signals."""
         self.ref_time = time.time()
         for ci in self.curve_items:
             ci.start_over = True
 
-    def shift_button_clicked(self):
+    def _shift_button_clicked(self):
         """Assign a curve to a different y axis."""
         index = self.ui.lvActiveSig.currentRow()
         ci = self.curve_items[index]
-        self.remove_curve_plot(ci)
+        self._remove_curve_plot(ci)
         ci.y_axis = (ci.y_axis % 3) + 1  # Todo: Have bug in IcePAPcms.
         ci.update_signature()
-        self.plot_curve(ci)
+        self._plot_curve(ci)
         self.ui.lvActiveSig.takeItem(index)
         self.ui.lvActiveSig.insertItem(index, ci.signature)
         self.ui.lvActiveSig.item(index).setForeground(ci.color)
@@ -302,7 +297,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.lvActiveSig.setCurrentRow(index)
         self._update_plot_axes_labels()
 
-    def plot_curve(self, ci):
+    def _plot_curve(self, ci):
         """
         Plot a curve.
 
@@ -311,7 +306,7 @@ class OscillaWindow(QtGui.QMainWindow):
         ci.curve_plot = pg.PlotCurveItem(x=ci.array_time, y=ci.array_val, pen=ci.pen)
         self.view_boxes[ci.y_axis - 1].addItem(ci.curve_plot)
 
-    def clear_signal(self):
+    def _clear_signal(self):
         """Remove the visible data for a signal."""
         index = self.ui.lvActiveSig.currentRow()
         self.curve_items[index].start_over = True
@@ -320,23 +315,23 @@ class OscillaWindow(QtGui.QMainWindow):
         index = self.ui.lvActiveSig.currentRow()
         ci = self.curve_items[index]
         self.collector.unsubscribe(ci.subscription_id)
-        self.remove_curve_plot(ci)
+        self._remove_curve_plot(ci)
         self.ui.lvActiveSig.takeItem(index)
         self.curve_items.remove(ci)
         self._update_plot_axes_labels()
         self._update_button_status()
 
-    def remove_all_signals(self):
+    def _remove_all_signals(self):
         """Removes all signals."""
         for ci in self.curve_items:
             self.collector.unsubscribe(ci.subscription_id)
-            self.remove_curve_plot(ci)
+            self._remove_curve_plot(ci)
         self.ui.lvActiveSig.clear()
         self.curve_items = []
         self._update_plot_axes_labels()
         self._update_button_status()
 
-    def mouse_moved(self, evt):
+    def _mouse_moved(self, evt):
         """
         Acts om mouse move.
 
@@ -358,7 +353,7 @@ class OscillaWindow(QtGui.QMainWindow):
             self.plot_widget.setTitle("<br>%s<br>%s<br>%s" % (txtmax, txt, txtmin))
             self.vertical_line.setPos(mouse_point.x())
 
-    def remove_curve_plot(self, ci):
+    def _remove_curve_plot(self, ci):
         """
         Remove a curve from the plot area.
 
@@ -366,34 +361,34 @@ class OscillaWindow(QtGui.QMainWindow):
         """
         self.view_boxes[ci.y_axis - 1].removeItem(ci.curve_plot)
 
-    def prepare_closed_loop(self):
+    def _prepare_closed_loop(self):
         """Display a specific set of curves."""
-        self.remove_all_signals()
+        self._remove_all_signals()
         drv_addr = int(self.ui.cbDrivers.currentText())
-        self.add_curve(drv_addr, 'PosAxis', 1)
-        self.add_curve(drv_addr, 'DifAxTgtenc', 2)
-        self.add_curve(drv_addr, 'DifAxMotor', 2)
-        self.add_curve(drv_addr, 'StatReady', 3)
-        self.add_curve(drv_addr, 'StatMoving', 3)
-        self.add_curve(drv_addr, 'StatSettling', 3)
-        self.add_curve(drv_addr, 'StatOutofwin', 3)
+        self._add_curve(drv_addr, 'PosAxis', 1)
+        self._add_curve(drv_addr, 'DifAxTgtenc', 2)
+        self._add_curve(drv_addr, 'DifAxMotor', 2)
+        self._add_curve(drv_addr, 'StatReady', 3)
+        self._add_curve(drv_addr, 'StatMoving', 3)
+        self._add_curve(drv_addr, 'StatSettling', 3)
+        self._add_curve(drv_addr, 'StatOutofwin', 3)
 
-    def prepare_currents(self):
+    def _prepare_currents(self):
         """Display a specific set of curves."""
-        self.remove_all_signals()
+        self._remove_all_signals()
         drv_addr = int(self.ui.cbDrivers.currentText())
-        self.add_curve(drv_addr, 'PosAxis', 1)
-        self.add_curve(drv_addr, 'MeasI', 2)
-        self.add_curve(drv_addr, 'MeasVm', 3)
+        self._add_curve(drv_addr, 'PosAxis', 1)
+        self._add_curve(drv_addr, 'MeasI', 2)
+        self._add_curve(drv_addr, 'MeasVm', 3)
 
-    def prepare_target(self):
+    def _prepare_target(self):
         """Display a specific set of curves."""
-        self.remove_all_signals()
+        self._remove_all_signals()
         drv_addr = int(self.ui.cbDrivers.currentText())
-        self.add_curve(drv_addr, 'PosAxis', 1)
-        self.add_curve(drv_addr, 'EncTgtenc', 2)
+        self._add_curve(drv_addr, 'PosAxis', 1)
+        self._add_curve(drv_addr, 'EncTgtenc', 2)
 
-    def now_button_clicked(self):
+    def _now_button_clicked(self):
         """Pan X axis to display newest values."""
         #now = time.time() - self.ref_time
         now = time.time()
@@ -401,7 +396,7 @@ class OscillaWindow(QtGui.QMainWindow):
         x_big = self.view_boxes[0].viewRange()[0][1]
         self.view_boxes[0].setXRange(now - (x_big - x_small), now, padding=0)
 
-    def pause_button_clicked(self):
+    def _pause_button_clicked(self):
         """Freeze the X axis."""
         if self.ticker.isActive():
             self.ticker.stop()

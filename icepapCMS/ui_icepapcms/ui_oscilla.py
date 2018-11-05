@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'oscilla.ui'
 #
-# Created: Thu Nov  1 15:26:18 2018
+# Created: Mon Nov  5 08:17:23 2018
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,6 +27,9 @@ class Ui_OscillaWindow(object):
     def setupUi(self, OscillaWindow):
         OscillaWindow.setObjectName(_fromUtf8("OscillaWindow"))
         OscillaWindow.resize(891, 569)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("IcepapCfg Icons/gnome-monitor.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        OscillaWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(OscillaWindow)
         self.centralwidget.setEnabled(True)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)

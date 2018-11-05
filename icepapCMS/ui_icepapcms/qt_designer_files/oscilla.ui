@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Dummy Window Title</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>IcepapCfg Icons/gnome-monitor.png</normaloff>IcepapCfg Icons/gnome-monitor.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="enabled">
     <bool>true</bool>
