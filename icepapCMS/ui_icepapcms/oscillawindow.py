@@ -112,10 +112,12 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.setupUi(self)
         self.setWindowTitle('Oscilla  |  ' + host)
         self.curve_items = []
+        self._paused = False
 
         self.plot_widget = pg.PlotWidget()
         self.view_boxes = [self.plot_widget.getViewBox(), pg.ViewBox(), pg.ViewBox()]
-        self.view_boxes[0].setXRange(time.time() - 30, time.time(), padding=0)
+        self._initial_x_range = 30  # [seconds]
+        self.view_boxes[0].setXRange(time.time() - self._initial_x_range, time.time(), padding=0)
         self._plot_item = self.plot_widget.getPlotItem()
         self.ui.vloCurves.setDirection(QtGui.QBoxLayout.BottomToTop)
         self.ui.vloCurves.addWidget(self.plot_widget)
@@ -146,13 +148,13 @@ class OscillaWindow(QtGui.QMainWindow):
 
         self.ref_time = time.time()
         self.last_now = None
-        self.ticker = Qt.QTimer(self)
+        #self.ticker = Qt.QTimer(self)
         self.tick_interval = 1000  # [milliseconds]
 
         self._connect_signals()
         self.proxy = pg.SignalProxy(self.plot_widget.scene().sigMouseMoved, rateLimit=60, slot=self._mouse_moved)
 
-        self.ticker.start(self.tick_interval)
+        #self.ticker.start(self.tick_interval)
 
     def _fill_combo_box_driver_ids(self, selected_driver):
         driver_ids = self.collector.get_available_drivers()
@@ -173,7 +175,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.cbSignals.setCurrentIndex(0)
 
     def _connect_signals(self):
-        QtCore.QObject.connect(self.ticker, QtCore.SIGNAL("timeout()"), self._tick)
+        #QtCore.QObject.connect(self.ticker, QtCore.SIGNAL("timeout()"), self._tick)
         self.ui.rbAxis1.clicked.connect(self._select_axis_1)
         self.ui.rbAxis2.clicked.connect(self._select_axis_2)
         self.ui.rbAxis3.clicked.connect(self._select_axis_3)
@@ -237,17 +239,6 @@ class OscillaWindow(QtGui.QMainWindow):
         elif self.ui.rbAxis3.isChecked():
             my_axis = 3
         self._add_curve(addr, my_signal_name, my_axis)
-
-    def callback_plot(self, subscription_id, value_list):
-        for ci in self.curve_items:
-            if ci.subscription_id == subscription_id:
-                for t, v in value_list:
-                    ci.array_time.append(t)
-                    ci.array_val.append(v)
-                    if v > ci.val_max:
-                        ci.val_max = v
-                    elif v < ci.val_min:
-                        ci.val_min = v
 
     def _add_curve(self, driver_addr, signal_name, y_axis):
         """
@@ -398,12 +389,27 @@ class OscillaWindow(QtGui.QMainWindow):
 
     def _pause_button_clicked(self):
         """Freeze the X axis."""
-        if self.ticker.isActive():
-            self.ticker.stop()
-            self.ui.btnPause.setText('Run')
-        else:
-            self.ticker.start(self.tick_interval)
+        if self._paused:
+            #self.ticker.stop()
+            self._paused = False
             self.ui.btnPause.setText('Pause')
+        else:
+            #self.ticker.start(self.tick_interval)
+            self._paused = True
+            self.ui.btnPause.setText('Run')
+
+    def callback_plot(self, subscription_id, value_list):
+        for ci in self.curve_items:
+            if ci.subscription_id == subscription_id:
+                for t, v in value_list:
+                    ci.array_time.append(t)
+                    ci.array_val.append(v)
+                    if v > ci.val_max:
+                        ci.val_max = v
+                    elif v < ci.val_min:
+                        ci.val_min = v
+        if not self._paused:
+            self._tick()
 
     def _tick(self):
         #now = time.time() - self.ref_time
@@ -417,4 +423,4 @@ class OscillaWindow(QtGui.QMainWindow):
         for ci in self.curve_items:
             ci.curve_plot.setData(x=ci.array_time, y=ci.array_val)
         self.last_now = now
-        self.ticker.start(self.tick_interval)
+        #self.ticker.start(self.tick_interval)
