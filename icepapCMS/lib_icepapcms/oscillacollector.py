@@ -241,7 +241,7 @@ class Collector:
         self.ticker.start(self.tick_interval)
 
     def _connect_signals(self):
-        self.ticker.timeout.connect(self._tick)
+        self.ticker.timeout.connect(self._tick)  # Todo: Fix warning.
 
     def get_available_drivers(self):
         return self.icepap_system.keys()
@@ -292,5 +292,5 @@ class Collector:
                     channel.collected_samples = []
             except RuntimeError as e:  # Todo: Needed?
                 msg = 'Failed to collect data for signal {}\n{}'.format(channel.sig_name, e)
-                print(msg)
+                #print(msg)  # Todo: Investigate oscilla shutdown when started from IcePAPcms.
         self.ticker.start(self.tick_interval)

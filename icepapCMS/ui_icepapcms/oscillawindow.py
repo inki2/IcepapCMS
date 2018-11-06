@@ -62,7 +62,7 @@ class CurveItem:
         sig_vals = self.signals[str(sig_name)]
         self.color = sig_vals.pen_color
         self.pen = {'color': sig_vals.pen_color, 'width': sig_vals.pen_width, 'style': sig_vals.pen_style}
-        self.curve_plot = None
+        self.curve = None
         self.signature = ''
         self.update_signature()
 
@@ -101,7 +101,7 @@ class OscillaWindow(QtGui.QMainWindow):
         except Exception as e:
             msg = 'Failed to create main window.\n{}'.format(e)
             print(msg)
-            QtGui.QMessageBox.critical(None, 'Create Main Window', msg)
+            QtGui.QMessageBox.critical(None, 'Create Main Window', msg)  # Todo: Fix warning.
             return
 
         self.subscriptions = {}
@@ -247,7 +247,7 @@ class OscillaWindow(QtGui.QMainWindow):
             return
         ci = CurveItem(subscription_id, driver_addr, signal_name, y_axis)
         self.collector.start(subscription_id)
-        self._plot_curve(ci)
+        self._add_curve(ci)
         self.curve_items.append(ci)
         self.ui.lvActiveSig.addItem(ci.signature)
         index = len(self.curve_items) - 1
@@ -296,7 +296,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self._remove_curve_plot(ci)
         ci.y_axis = (ci.y_axis % 3) + 1
         ci.update_signature()
-        self._plot_curve(ci)
+        self._add_curve(ci)
         self.ui.lvActiveSig.takeItem(index)
         self.ui.lvActiveSig.insertItem(index, ci.signature)
         self.ui.lvActiveSig.item(index).setForeground(ci.color)
@@ -304,14 +304,14 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.lvActiveSig.setCurrentRow(index)
         self._update_plot_axes_labels()
 
-    def _plot_curve(self, ci):
+    def _add_curve(self, ci):
         """
-        Plot a curve.
+        Create a new curve and add it to a viewbox.
 
-        ci - Curve item to plot.
+        ci - Curve item that will be the owner.
         """
-        ci.curve_plot = pg.PlotCurveItem(x=ci.array_time, y=ci.array_val, pen=ci.pen)
-        self.view_boxes[ci.y_axis - 1].addItem(ci.curve_plot)
+        ci.curve = pg.PlotCurveItem(x=ci.array_time, y=ci.array_val, pen=ci.pen)
+        self.view_boxes[ci.y_axis - 1].addItem(ci.curve)
 
     def _mouse_moved(self, evt):  # Todo: Review this.
         """
@@ -341,7 +341,7 @@ class OscillaWindow(QtGui.QMainWindow):
 
         ci - Curve item to remove.
         """
-        self.view_boxes[ci.y_axis - 1].removeItem(ci.curve_plot)
+        self.view_boxes[ci.y_axis - 1].removeItem(ci.curve)
 
     def _prepare_closed_loop(self):
         """Display a specific set of curves."""
@@ -411,4 +411,4 @@ class OscillaWindow(QtGui.QMainWindow):
 
         # Update the curves.
         for ci in self.curve_items:
-            ci.curve_plot.setData(x=ci.array_time, y=ci.array_val)
+            ci.curve.setData(x=ci.array_time, y=ci.array_val)

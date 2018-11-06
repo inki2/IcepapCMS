@@ -26,7 +26,16 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
     <number>9</number>
    </property>
    <property name="spacing">
@@ -56,7 +65,16 @@
       <property name="spacing">
        <number>2</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -115,7 +133,16 @@
           </size>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <property name="spacing">
@@ -161,7 +188,16 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QGridLayout">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>9</number>
+             </property>
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <property name="rightMargin">
+              <number>9</number>
+             </property>
+             <property name="bottomMargin">
               <number>9</number>
              </property>
              <property name="spacing">
@@ -202,7 +238,16 @@
                 <property name="spacing">
                  <number>0</number>
                 </property>
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
                  <number>0</number>
                 </property>
                 <item>
@@ -1075,7 +1120,7 @@ p, li { white-space: pre-wrap; }
                <property name="frameShadow">
                 <enum>QFrame::Raised</enum>
                </property>
-               <property name="numDigits">
+               <property name="digitCount">
                 <number>9</number>
                </property>
                <property name="segmentStyle">
@@ -1218,7 +1263,16 @@ p, li { white-space: pre-wrap; }
                 <property name="spacing">
                  <number>2</number>
                 </property>
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>2</number>
+                </property>
+                <property name="topMargin">
+                 <number>2</number>
+                </property>
+                <property name="rightMargin">
+                 <number>2</number>
+                </property>
+                <property name="bottomMargin">
                  <number>2</number>
                 </property>
                 <item>
@@ -1346,7 +1400,16 @@ p, li { white-space: pre-wrap; }
           <property name="spacing">
            <number>6</number>
           </property>
-          <property name="margin">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <item>
@@ -1598,26 +1661,21 @@ p, li { white-space: pre-wrap; }
        <string>Tune and testing</string>
       </attribute>
       <layout class="QGridLayout">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
         <number>6</number>
        </property>
-       <item row="6" column="6">
-        <widget class="QPushButton" name="btnStatus">
-         <property name="text">
-          <string>Status</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QCheckBox" name="cmdAUXPS">
-         <property name="text">
-          <string>Aux Supply 5V</string>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="1" rowspan="3">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
@@ -1755,17 +1813,49 @@ p, li { white-space: pre-wrap; }
          </widget>
         </widget>
        </item>
-       <item row="0" column="2" rowspan="6" colspan="8">
+       <item row="6" column="6">
+        <widget class="QPushButton" name="btnStatus">
+         <property name="text">
+          <string>Status</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="cmdAUXPS">
+         <property name="text">
+          <string>Aux Supply 5V</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" rowspan="6" colspan="7">
         <layout class="QVBoxLayout">
          <property name="spacing">
           <number>6</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
           <layout class="QGridLayout">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>2</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>2</number>
+           </property>
+           <property name="bottomMargin">
             <number>2</number>
            </property>
            <property name="spacing">
@@ -1917,7 +2007,7 @@ p, li { white-space: pre-wrap; }
              <property name="frameShadow">
               <enum>QFrame::Raised</enum>
              </property>
-             <property name="numDigits">
+             <property name="digitCount">
               <number>14</number>
              </property>
              <property name="segmentStyle">
@@ -2033,7 +2123,16 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <layout class="QGridLayout">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>2</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>2</number>
+           </property>
+           <property name="bottomMargin">
             <number>2</number>
            </property>
            <property name="spacing">
@@ -2192,7 +2291,7 @@ p, li { white-space: pre-wrap; }
              <property name="frameShadow">
               <enum>QFrame::Raised</enum>
              </property>
-             <property name="numDigits">
+             <property name="digitCount">
               <number>14</number>
              </property>
              <property name="segmentStyle">
@@ -2424,12 +2523,8 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="6" column="7">
-        <widget class="QPushButton" name="btnCurves">
-         <property name="text">
-          <string>Curves</string>
-         </property>
-        </widget>
+       <item row="6" column="5">
+        <widget class="QLineEdit" name="txtOffset"/>
        </item>
        <item row="6" column="2">
         <widget class="QLineEdit" name="txtSpu">
@@ -2441,9 +2536,6 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="6" column="5">
-        <widget class="QLineEdit" name="txtOffset"/>
-       </item>
        <item row="8" column="2" colspan="3">
         <widget class="QLineEdit" name="txtPosition">
          <property name="readOnly">
@@ -2451,7 +2543,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="8" column="5" colspan="5">
+       <item row="8" column="5" colspan="4">
         <widget class="QLineEdit" name="txtEncoder">
          <property name="readOnly">
           <bool>true</bool>

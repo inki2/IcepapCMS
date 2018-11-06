@@ -26,7 +26,7 @@ pyrcc4 icepapcms.qrc -o qrc_icepapcms.py
 /usr/bin/pyuic4 dialogconflictdriver_nonexpert.ui -o ui_dialogconflictdriver_nonexpert.py
 /usr/bin/pyuic4 dialogconflictdriver_expert.ui -o ui_dialogconflictdriver_expert.py
 /usr/bin/pyuic4 dialognewdriver.ui -o ui_dialognewdriver.py
-/usr/bin/pyuic4 dialogcurves.ui -o ui_dialogcurves.py
+/usr/bin/pyuic4 oscilla.ui -o ui_oscilla.py
 /usr/bin/pyuic4 dialogstatusinfo.ui -o ui_dialogstatusinfo.py
 
 DIR_DRIVERWIDGET=icepapdriver_widget

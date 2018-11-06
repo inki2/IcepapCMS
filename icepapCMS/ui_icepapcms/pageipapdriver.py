@@ -35,7 +35,6 @@ import time
 import datetime
 import tempfile
 from historiccfgwidget import HistoricCfgWidget
-from dialogcurves import DialogCurves
 from dialogstatusinfo import DialogStatusInfo
 
 
@@ -244,7 +243,6 @@ class PageiPapDriver(QtGui.QWidget):
 
         QtCore.QObject.connect(self.ui.cmdCSWITCH,QtCore.SIGNAL("currentIndexChanged(QString)"),self.changeSwitchesSetup)
 
-        self.ui.btnCurves.clicked.connect(self.addDialogCurves)
         self.ui.btnStatus.clicked.connect(self.addDialogStatus)
         self.ui.cbHomeSrch1.currentIndexChanged.connect(self.cbHomeSrch1Changed)
         self.ui.cbHomeSrch2.currentIndexChanged.connect(self.cbHomeSrch2Changed)
@@ -1622,10 +1620,6 @@ class PageiPapDriver(QtGui.QWidget):
             self.ui.txtOffset.setText('0')
         self.ui.txtPosition.setText(str(float(self.ui.txtOffset.text()) + float(pos)/float(self.ui.txtSpu.text())))
         self.ui.txtEncoder.setText(str(float(self.ui.txtOffset.text()) + float(enc)/float(self.ui.txtEpu.text())))
-
-    def addDialogCurves(self):
-        d = DialogCurves(self, self.icepap_driver)
-        d.show()
 
     def addDialogStatus(self):
         d = DialogStatusInfo(self, self.icepap_driver)
