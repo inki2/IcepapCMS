@@ -1,20 +1,15 @@
-try:
-    from PyQt5 import QtCore
-    from PyQt5 import Qt
-except ImportError as ie:
-    from PyQt4 import QtCore
-    from PyQt4 import Qt
+from PyQt4.QtCore import QTimer
+from PyQt4.QtCore import QString
 import time
 from pyIcePAP import EthIcePAPController
 
 
 class Channel:
 
-    def __init__(self, icepap_address, signal_name, system):  # Todo: Avoid taking system as parameter.
-        self.drv_address = icepap_address
+    def __init__(self, system, address, signal_name):
+        self.system = system
+        self.axis = system[address]
         self.sig_name = signal_name
-        self.icepap_system = system
-        self.axis = system[icepap_address]
         self.measure_resolution = 1.
         self.signal_val_getter = self._set_signal_val_getter(signal_name)
         self.collected_samples = []
@@ -22,9 +17,9 @@ class Channel:
         try:
             cfg = self.axis.get_cfg()
         except RuntimeError as e:
-            msg = 'Failed to retrieve configuration parameters for driver {}\n{}.'.format(self.drv_address, e)
+            msg = 'Failed to retrieve configuration parameters for driver {}\n{}.'.format(self.axis.addr, e)
             raise Exception(msg)
-        sn = QtCore.QString(self.sig_name)
+        sn = QString(self.sig_name)
         if (sn.endsWith('Tgtenc') and cfg['TGTENC'].upper() == 'NONE') or \
                 (sn.endsWith('Shftenc') and cfg['SHFTENC'].upper() == 'NONE'):
             msg = 'Signal {} is not mapped/valid.'.format(sn)
@@ -33,7 +28,7 @@ class Channel:
             self.measure_resolution = self._calc_measure_resolution(cfg)
 
     def equals(self, icepap_addr, signal_name):
-        if icepap_addr != self.drv_address:
+        if icepap_addr != self.axis.addr:
             return False
         if signal_name != self.sig_name:
             return False
@@ -83,7 +78,7 @@ class Channel:
         return self.axis.pos_ctrlenc
 
     def _getter_pos_measure(self):
-        return self.icepap_system.get_fpos(self.drv_address, 'MEASURE')[0]  # Todo: Ude axis instead somehow?
+        return self.system.get_fpos(self.axis.addr, 'MEASURE')[0]
 
     def _getter_enc_encin(self):
         return self.axis.enc_encin
@@ -241,16 +236,19 @@ class Collector:
             raise Exception(msg)
 
         self.tick_interval = 100  # [milliseconds]
-        self.ticker = Qt.QTimer()
-        #self.ref_time = time.time()
+        self.ticker = QTimer()
         self._connect_signals()
         self.ticker.start(self.tick_interval)
 
     def _connect_signals(self):
-        QtCore.QObject.connect(self.ticker, QtCore.SIGNAL("timeout()"), self._tick)
+        self.ticker.timeout.connect(self._tick)
 
     def get_available_drivers(self):
         return self.icepap_system.keys()
+
+    @staticmethod
+    def get_current_time():
+        return time.time()
 
     def subscribe(self, icepap_addr, signal_name):
         """
@@ -266,7 +264,7 @@ class Collector:
                 msg = 'Channel already exists.\nAddr: {}\nSignal: {}'.format(icepap_addr, signal_name)
                 raise Exception(msg)
         try:
-            channel = Channel(icepap_addr, signal_name, self.icepap_system)
+            channel = Channel(self.icepap_system, icepap_addr, signal_name)
         except Exception as e:
             msg = 'Failed to create channel.\nAddr: {}\nSignal: {}\n{}'.format(icepap_addr, signal_name, e)
             raise Exception(msg)
@@ -284,7 +282,6 @@ class Collector:
             del self.channels_subscribed[subscription_id]
 
     def _tick(self):
-        #now = time.time() - self.ref_time
         for subscription_id, channel in self.channels_started.iteritems():
             try:
                 val = channel.signal_val_getter()

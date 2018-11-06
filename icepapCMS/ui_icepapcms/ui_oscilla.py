@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'oscilla.ui'
 #
-# Created: Mon Nov  5 08:17:23 2018
+# Created: Tue Nov  6 08:08:18 2018
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -268,8 +268,8 @@ class Ui_OscillaWindow(object):
 
     def retranslateUi(self, OscillaWindow):
         OscillaWindow.setWindowTitle(_translate("OscillaWindow", "Dummy Window Title", None))
-        self.labelDrivers.setText(_translate("OscillaWindow", "Drivers:", None))
-        self.labelSignals.setText(_translate("OscillaWindow", "Signals:", None))
+        self.labelDrivers.setText(_translate("OscillaWindow", "Driver:", None))
+        self.labelSignals.setText(_translate("OscillaWindow", "Signal:", None))
         self.labelAxis.setText(_translate("OscillaWindow", "Axis:", None))
         self.rbAxis1.setText(_translate("OscillaWindow", "1", None))
         self.rbAxis2.setText(_translate("OscillaWindow", "2", None))
@@ -281,7 +281,7 @@ class Ui_OscillaWindow(object):
         self.labelClear.setText(_translate("OscillaWindow", "Clear:", None))
         self.btnClearSignal.setText(_translate("OscillaWindow", "Selected", None))
         self.btnClearAll.setText(_translate("OscillaWindow", "All", None))
-        self.btnShift.setText(_translate("OscillaWindow", "Shift Axis", None))
+        self.btnShift.setText(_translate("OscillaWindow", "Shift Y-axis", None))
         self.btnCLoop.setText(_translate("OscillaWindow", "* Closed Loop *", None))
         self.btnCurrents.setText(_translate("OscillaWindow", "* Currents *", None))
         self.btnTarget.setText(_translate("OscillaWindow", "* Target *", None))
