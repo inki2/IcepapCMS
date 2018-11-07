@@ -75,8 +75,8 @@ class CurveItem:
         self.y_axis = y_axis
         self.array_time = []  # Todo: Protect from simultaneous writing?
         self.array_val = []
-        self.val_min = 0  # Todo: Maybe never have smaller.
-        self.val_max = 0  # Todo: Maybe never have bigger.
+        self.val_min = 0
+        self.val_max = 0
         sig_vals = self.signals[str(sig_name)]
         self.color = sig_vals.pen_color
         self.pen = {'color': sig_vals.pen_color, 'width': sig_vals.pen_width, 'style': sig_vals.pen_style}
@@ -146,7 +146,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self._plot_item.getAxis('bottom').hide()  # Hide the old x-axis.
         self._axisTime = AxisTime(orientation='bottom')  # Create a new X-axis with human readable time labels.
         self._axisTime.linkToView(self.view_boxes[0])
-        self._plot_item.layout.addItem(self._axisTime, 3, 1)
+        self._plot_item.layout.addItem(self._axisTime, 3, 1)  # Todo: QGridLayoutEngine::addItem: Cell (3, 1) already taken
         self._initial_x_range = 30  # [seconds]
         self.now = self.collector.get_current_time()
         self.view_boxes[0].setXRange(self.now - self._initial_x_range, self.now, padding=0)
@@ -349,7 +349,7 @@ class OscillaWindow(QtGui.QMainWindow):
         my_curve = ci.create_curve()
         self.view_boxes[ci.y_axis - 1].addItem(my_curve)
 
-    def _mouse_moved(self, evt):  # Todo: Review this.
+    def _mouse_moved(self, evt):
         """
         Acts om mouse move.
 
@@ -359,16 +359,18 @@ class OscillaWindow(QtGui.QMainWindow):
         if self.plot_widget.sceneBoundingRect().contains(pos):
             mouse_point = self.view_boxes[0].mapSceneToView(pos)
             time_value = mouse_point.x()
-            txt = "<span style='font-size: 8pt; color: white;'>" + "%0.2f" % time_value + "</span>"
+            pretty_time = time.strftime("%H:%M:%S", time.gmtime(time_value))
             txtmax = ''
+            txtnow = ''
             txtmin = ''
             for ci in self.curve_items:
+                txt1 = "<span style='font-size: 8pt; color: {};'>|".format(ci.color.name())
                 if ci.array_time and ci.array_time[0] < time_value < ci.array_time[-1]:
-                    txt1 = "<span style='font-size: 8pt; color: %s;'>" % ci.color.name() + '|'
-                    txt += txt1 + str(ci.get_y(time_value)) + "</span>"
-                    txtmin += txt1 + str(ci.val_min) + "</span>"
-                    txtmax += txt1 + str(ci.val_max) + "</span>"
-            self.plot_widget.setTitle("<br>%s<br>%s<br>%s" % (txtmax, txt, txtmin))
+                    txtmax += "{}{}</span>".format(txt1, ci.val_max)
+                    txtnow += "{}{}</span>".format(txt1, ci.get_y(time_value))
+                    txtmin += "{}{}</span>".format(txt1, ci.val_min)
+            txtnow += "|<span style='font-size: 8pt; color: white;'>{}</span>".format(pretty_time)
+            self.plot_widget.setTitle("<br>{}<br>{}<br>{}".format(txtmax, txtnow, txtmin))
             self.vertical_line.setPos(mouse_point.x())
 
     def _remove_curve_plot(self, ci):
@@ -425,6 +427,9 @@ class OscillaWindow(QtGui.QMainWindow):
     def callback_plot(self, subscription_id, value_list):
         for ci in self.curve_items:
             if ci.subscription_id == subscription_id:
+                if not ci.array_val:
+                    ci.val_max = value_list[0][1]
+                    ci.val_min = value_list[0][1]
                 for t, v in value_list:
                     ci.array_time.append(t)
                     ci.array_val.append(v)
