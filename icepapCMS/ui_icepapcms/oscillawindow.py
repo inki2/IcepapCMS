@@ -1,9 +1,27 @@
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from ui_oscilla import Ui_OscillaWindow
-from lib_icepapcms.oscillacollector import Collector  # Todo: Cannot find reference 'oscillacollector' in '__init__.py
+from lib_icepapcms import Collector  # Todo: Cannot find reference 'Collector' in '__init__.py
 import pyqtgraph as pg
 from collections import namedtuple
+import time
+
+
+class AxisTime(pg.AxisItem):
+    """
+    Formats axis labels to human readable time.
+    values  - List of time values (Format: Seconds since 1970).
+    scale   - Not used.
+    spacing - Not used.
+    """
+    def tickStrings(self, values, scale, spacing):
+        strings = []
+        for x in values:
+            try:
+                strings.append(time.strftime("%H:%M:%S", time.gmtime(x)))
+            except ValueError:  # Windows can't handle dates before 1970.
+                strings.append('')
+        return strings
 
 
 class CurveItem:
@@ -70,6 +88,13 @@ class CurveItem:
         """Sets the new value of the signature string."""
         self.signature = '{}:{}:{}'.format(self.driver_addr, self.signal_name, self.y_axis)
 
+    def create_curve(self):
+        self.curve = pg.PlotCurveItem(x=self.array_time, y=self.array_val, pen=self.pen)
+        return self.curve
+
+    def update_curve(self):
+        self.curve.setData(x=self.array_time, y=self.array_val)
+
     def get_y(self, t_val):
         """
         Retrieve the signal value corresponding to the provided time value.
@@ -93,8 +118,6 @@ class OscillaWindow(QtGui.QMainWindow):
         port - IcePAP system port number.
         """
         QtGui.QMainWindow.__init__(self, None)
-        self.ui = Ui_OscillaWindow()
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         try:
             self.collector = Collector(host, port, self.callback_plot)
@@ -105,20 +128,30 @@ class OscillaWindow(QtGui.QMainWindow):
             return
 
         self.subscriptions = {}
-
-        self.ui.setupUi(self)
-        self.setWindowTitle('Oscilla  |  ' + host)
         self.curve_items = []
         self._paused = False
 
+        self.ui = Ui_OscillaWindow()
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        self.ui.setupUi(self)
+        self.setWindowTitle('Oscilla  |  ' + host)
+
         self.plot_widget = pg.PlotWidget()
+        self._plot_item = self.plot_widget.getPlotItem()
         self.view_boxes = [self.plot_widget.getViewBox(), pg.ViewBox(), pg.ViewBox()]
+        self.ui.vloCurves.setDirection(QtGui.QBoxLayout.BottomToTop)
+        self.ui.vloCurves.addWidget(self.plot_widget)
+
+        # Set up the X-axis.
+        self._plot_item.getAxis('bottom').hide()  # Hide the old x-axis.
+        self._axisTime = AxisTime(orientation='bottom')  # Create a new X-axis with human readable time labels.
+        self._axisTime.linkToView(self.view_boxes[0])
+        self._plot_item.layout.addItem(self._axisTime, 3, 1)
         self._initial_x_range = 30  # [seconds]
         self.now = self.collector.get_current_time()
         self.view_boxes[0].setXRange(self.now - self._initial_x_range, self.now, padding=0)
-        self._plot_item = self.plot_widget.getPlotItem()
-        self.ui.vloCurves.setDirection(QtGui.QBoxLayout.BottomToTop)
-        self.ui.vloCurves.addWidget(self.plot_widget)
+
+        # Set up the three Y-axes.
         self._plot_item.showAxis('right')
         self._plot_item.scene().addItem(self.view_boxes[1])
         self._plot_item.scene().addItem(self.view_boxes[2])
@@ -128,16 +161,19 @@ class OscillaWindow(QtGui.QMainWindow):
         self.view_boxes[1].setXLink(self.view_boxes[0])
         self.view_boxes[2].setXLink(self.view_boxes[0])
         self._plot_item.layout.addItem(self.axes[2], 2, 3)
+
         self.view_boxes[0].disableAutoRange(axis=self.view_boxes[0].XAxis)
         self.view_boxes[0].enableAutoRange(axis=self.view_boxes[0].YAxis)
         self.view_boxes[1].disableAutoRange(axis=self.view_boxes[1].XAxis)
         self.view_boxes[1].enableAutoRange(axis=self.view_boxes[1].YAxis)
         self.view_boxes[2].disableAutoRange(axis=self.view_boxes[2].XAxis)
         self.view_boxes[2].enableAutoRange(axis=self.view_boxes[2].YAxis)
+
         self.label = pg.LabelItem(justify='right')
+        self.view_boxes[0].addItem(self.label)
+
         self.vertical_line = pg.InfiniteLine(angle=90, movable=False)
         self.view_boxes[0].addItem(self.vertical_line, ignoreBounds=True)
-        self.view_boxes[0].addItem(self.label)
 
         self._fill_combo_box_driver_ids(selected_driver)
         self._fill_combo_box_signals()
@@ -310,8 +346,8 @@ class OscillaWindow(QtGui.QMainWindow):
 
         ci - Curve item that will be the owner.
         """
-        ci.curve = pg.PlotCurveItem(x=ci.array_time, y=ci.array_val, pen=ci.pen)
-        self.view_boxes[ci.y_axis - 1].addItem(ci.curve)
+        my_curve = ci.create_curve()
+        self.view_boxes[ci.y_axis - 1].addItem(my_curve)
 
     def _mouse_moved(self, evt):  # Todo: Review this.
         """
@@ -411,4 +447,4 @@ class OscillaWindow(QtGui.QMainWindow):
 
         # Update the curves.
         for ci in self.curve_items:
-            ci.curve.setData(x=ci.array_time, y=ci.array_val)
+            ci.update_curve()
