@@ -523,9 +523,23 @@
            </spacer>
           </item>
           <item>
+           <widget class="QPushButton" name="btnSeeAll">
+            <property name="text">
+             <string>See All</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btnPause">
             <property name="text">
              <string>Pause</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn30sec">
+            <property name="text">
+             <string>30 sec</string>
             </property>
            </widget>
           </item>

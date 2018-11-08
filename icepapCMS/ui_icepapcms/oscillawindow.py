@@ -16,11 +16,12 @@ class AxisTime(pg.AxisItem):
     spacing - Not used.
     """
     def tickStrings(self, values, scale, spacing):
+        """We override this function to have the X-axis labels display our way."""
         strings = []
         for x in values:
             try:
                 strings.append(time.strftime("%H:%M:%S", time.gmtime(x)))
-            except ValueError:  # Windows can't handle dates before 1970.
+            except ValueError:  # Time out of range.
                 strings.append('')
         return strings
 
@@ -91,30 +92,50 @@ class CurveItem:
         self.signature = '{}:{}:{}'.format(self.driver_addr, self.signal_name, self.y_axis)
 
     def create_curve(self):
+        """Creates a new plot item."""
         with self.lock:
             self.curve = pg.PlotCurveItem(x=self.array_time, y=self.array_val, pen=self.pen)
         return self.curve
 
     def update_curve(self):
+        """Updates the curve with recent collected data."""
         with self.lock:
             self.curve.setData(x=self.array_time, y=self.array_val)
 
     def clear(self):
+        """Clear all collected data."""
         with self.lock:
             self.array_time = []
             self.array_val = []
 
     def in_range(self, t):
+        """
+        Check to see if time is within range of collected data.
+
+        t - Time value.
+        Return: True if time is within range of collected data. Otherwise False.
+        """
         with self.lock:
             if self.array_time and self.array_time[0] < t < self.array_time[-1]:
                 return True
         return False
 
+    def start_time(self):
+        """
+        Get time for first data sample.
+
+        Return: Time of the first collected data sample. -1 if none.
+        """
+        with self.lock:
+            if self.array_time:
+                return self.array_time[0]
+        return -1
+
     def collect(self, new_data):
+        """Store new collected data."""
         with self.lock:
             if not self.array_val:
-                self.val_max = new_data[0][1]
-                self.val_min = new_data[0][1]
+                self.val_min = self.val_max = new_data[0][1]
             for t, v in new_data:
                 self.array_time.append(t)
                 self.array_val.append(v)
@@ -177,9 +198,8 @@ class OscillaWindow(QtGui.QMainWindow):
         self._axisTime.linkToView(self.view_boxes[0])
         self._plot_item.layout.removeItem(self._plot_item.getAxis('bottom'))
         self._plot_item.layout.addItem(self._axisTime, 3, 1)
-        self._initial_x_range = 30  # [seconds]
+        self._view_last_30_seconds()
         self.now = self.collector.get_current_time()
-        self.view_boxes[0].setXRange(self.now - self._initial_x_range, self.now, padding=0)
 
         # Set up the three Y-axes.
         self._plot_item.showAxis('right')
@@ -244,8 +264,10 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.btnCLoop.clicked.connect(self._setup_signal_set_closed_loop)
         self.ui.btnCurrents.clicked.connect(self._setup_signal_set_currents)
         self.ui.btnTarget.clicked.connect(self._setup_signal_set_target)
-        self.ui.btnPause.clicked.connect(self._pause_button_clicked)
-        self.ui.btnNow.clicked.connect(self._now_button_clicked)
+        self.ui.btnSeeAll.clicked.connect(self._view_all_data)
+        self.ui.btn30sec.clicked.connect(self._view_last_30_seconds)
+        self.ui.btnPause.clicked.connect(self._pause_x_axis)
+        self.ui.btnNow.clicked.connect(self._goto_now)
         self.view_boxes[0].sigResized.connect(self._update_views)
 
     def _update_views(self):
@@ -387,7 +409,10 @@ class OscillaWindow(QtGui.QMainWindow):
         if self.plot_widget.sceneBoundingRect().contains(pos):
             mouse_point = self.view_boxes[0].mapSceneToView(pos)
             time_value = mouse_point.x()
-            pretty_time = time.strftime("%H:%M:%S", time.gmtime(time_value))
+            try:
+                pretty_time = time.strftime("%H:%M:%S", time.gmtime(time_value))
+            except ValueError:  # Time out of range.
+                return
             txtmax = ''
             txtnow = ''
             txtmin = ''
@@ -436,14 +461,21 @@ class OscillaWindow(QtGui.QMainWindow):
         self._add_signal(drv_addr, 'PosAxis', 1)
         self._add_signal(drv_addr, 'EncTgtenc', 2)
 
-    def _now_button_clicked(self):
-        """Pan X axis to display newest values."""
-        self.now = self.collector.get_current_time()
-        x_small = self.view_boxes[0].viewRange()[0][0]
-        x_big = self.view_boxes[0].viewRange()[0][1]
-        self.view_boxes[0].setXRange(self.now - (x_big - x_small), self.now, padding=0)
+    def _view_all_data(self):
+        """Adjust X axis to view all collected data."""
+        time_start = self.collector.get_current_time()
+        for ci in self.curve_items:
+            t = ci.start_time()
+            if 0 < t < time_start:
+                time_start = t
+        self.view_boxes[0].setXRange(time_start, self.collector.get_current_time(), padding=0)
 
-    def _pause_button_clicked(self):
+    def _view_last_30_seconds(self):
+        """Adjust X axis to view the last 30 seconds."""
+        now = self.collector.get_current_time()
+        self.view_boxes[0].setXRange(now - 30, now, padding=0)
+
+    def _pause_x_axis(self):
         """Freeze the X axis."""
         if self._paused:
             self._paused = False
@@ -452,7 +484,20 @@ class OscillaWindow(QtGui.QMainWindow):
             self._paused = True
             self.ui.btnPause.setText('Run')
 
+    def _goto_now(self):
+        """Pan X axis to display newest values."""
+        now = self.collector.get_current_time()
+        x_small = self.view_boxes[0].viewRange()[0][0]
+        x_big = self.view_boxes[0].viewRange()[0][1]
+        self.view_boxes[0].setXRange(now - (x_big - x_small), now, padding=0)
+
     def callback_collect(self, subscription_id, value_list):
+        """
+        Callback function that stores the data collected from IcePAP.
+
+        subscription_id - Subscription id.
+        value_list - List of tuples (time, value).
+        """
         for ci in self.curve_items:
             if ci.subscription_id == subscription_id:
                 ci.collect(value_list)
@@ -463,7 +508,7 @@ class OscillaWindow(QtGui.QMainWindow):
         # Update the X-axis.
         x_small = self.view_boxes[0].viewRange()[0][0]
         x_big = self.view_boxes[0].viewRange()[0][1]
-        now_in_range = self.now <= x_big
+        now_in_range = self.now <= x_big + 0.1
         self.now = self.collector.get_current_time()
         if now_in_range:
             self.view_boxes[0].setXRange(self.now - (x_big - x_small), self.now, padding=0)

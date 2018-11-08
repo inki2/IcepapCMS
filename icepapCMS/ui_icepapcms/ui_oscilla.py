@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'oscilla.ui'
 #
-# Created: Tue Nov  6 08:08:18 2018
+# Created: Thu Nov  8 13:32:09 2018
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -243,9 +243,15 @@ class Ui_OscillaWindow(object):
         self.hloCurveButtons.setObjectName(_fromUtf8("hloCurveButtons"))
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.hloCurveButtons.addItem(spacerItem1)
+        self.btnSeeAll = QtGui.QPushButton(self.centralwidget)
+        self.btnSeeAll.setObjectName(_fromUtf8("btnSeeAll"))
+        self.hloCurveButtons.addWidget(self.btnSeeAll)
         self.btnPause = QtGui.QPushButton(self.centralwidget)
         self.btnPause.setObjectName(_fromUtf8("btnPause"))
         self.hloCurveButtons.addWidget(self.btnPause)
+        self.btn30sec = QtGui.QPushButton(self.centralwidget)
+        self.btn30sec.setObjectName(_fromUtf8("btn30sec"))
+        self.hloCurveButtons.addWidget(self.btn30sec)
         self.btnNow = QtGui.QPushButton(self.centralwidget)
         self.btnNow.setObjectName(_fromUtf8("btnNow"))
         self.hloCurveButtons.addWidget(self.btnNow)
@@ -285,6 +291,8 @@ class Ui_OscillaWindow(object):
         self.btnCLoop.setText(_translate("OscillaWindow", "* Closed Loop *", None))
         self.btnCurrents.setText(_translate("OscillaWindow", "* Currents *", None))
         self.btnTarget.setText(_translate("OscillaWindow", "* Target *", None))
+        self.btnSeeAll.setText(_translate("OscillaWindow", "See All", None))
         self.btnPause.setText(_translate("OscillaWindow", "Pause", None))
+        self.btn30sec.setText(_translate("OscillaWindow", "30 sec", None))
         self.btnNow.setText(_translate("OscillaWindow", "Goto Now", None))
 
