@@ -2,8 +2,9 @@ from PyQt4 import QtGui
 from PyQt4 import QtCore
 from ui_oscilla import Ui_OscillaWindow
 from lib_icepapcms import Collector  # Todo: Cannot find reference 'Collector' in '__init__.py
-import pyqtgraph as pg
 from collections import namedtuple
+from threading import Lock
+import pyqtgraph as pg
 import time
 
 
@@ -73,7 +74,7 @@ class CurveItem:
         self.driver_addr = driver_addr
         self.signal_name = sig_name
         self.y_axis = y_axis
-        self.array_time = []  # Todo: Protect from simultaneous writing?
+        self.array_time = []
         self.array_val = []
         self.val_min = 0
         self.val_max = 0
@@ -81,6 +82,7 @@ class CurveItem:
         self.color = sig_vals.pen_color
         self.pen = {'color': sig_vals.pen_color, 'width': sig_vals.pen_width, 'style': sig_vals.pen_style}
         self.curve = None
+        self.lock = Lock()
         self.signature = ''
         self.update_signature()
 
@@ -89,11 +91,37 @@ class CurveItem:
         self.signature = '{}:{}:{}'.format(self.driver_addr, self.signal_name, self.y_axis)
 
     def create_curve(self):
-        self.curve = pg.PlotCurveItem(x=self.array_time, y=self.array_val, pen=self.pen)
+        with self.lock:
+            self.curve = pg.PlotCurveItem(x=self.array_time, y=self.array_val, pen=self.pen)
         return self.curve
 
     def update_curve(self):
-        self.curve.setData(x=self.array_time, y=self.array_val)
+        with self.lock:
+            self.curve.setData(x=self.array_time, y=self.array_val)
+
+    def clear(self):
+        with self.lock:
+            self.array_time = []
+            self.array_val = []
+
+    def in_range(self, t):
+        with self.lock:
+            if self.array_time and self.array_time[0] < t < self.array_time[-1]:
+                return True
+        return False
+
+    def collect(self, new_data):
+        with self.lock:
+            if not self.array_val:
+                self.val_max = new_data[0][1]
+                self.val_min = new_data[0][1]
+            for t, v in new_data:
+                self.array_time.append(t)
+                self.array_val.append(v)
+                if v > self.val_max:
+                    self.val_max = v
+                elif v < self.val_min:
+                    self.val_min = v
 
     def get_y(self, t_val):
         """
@@ -102,9 +130,10 @@ class CurveItem:
         t_val - Time value.
         Return: Signal value corresponding to an adjacent sample in time.
         """
-        for x, v in zip(self.array_time, self.array_val):
-            if x > t_val:
-                return v
+        with self.lock:
+            for x, v in zip(self.array_time, self.array_val):
+                if x > t_val:
+                    return v
 
 
 class OscillaWindow(QtGui.QMainWindow):
@@ -120,7 +149,7 @@ class OscillaWindow(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self, None)
 
         try:
-            self.collector = Collector(host, port, self.callback_plot)
+            self.collector = Collector(host, port, self.callback_collect)
         except Exception as e:
             msg = 'Failed to create main window.\n{}'.format(e)
             print(msg)
@@ -146,7 +175,8 @@ class OscillaWindow(QtGui.QMainWindow):
         self._plot_item.getAxis('bottom').hide()  # Hide the old x-axis.
         self._axisTime = AxisTime(orientation='bottom')  # Create a new X-axis with human readable time labels.
         self._axisTime.linkToView(self.view_boxes[0])
-        self._plot_item.layout.addItem(self._axisTime, 3, 1)  # Todo: QGridLayoutEngine::addItem: Cell (3, 1) already taken
+        self._plot_item.layout.removeItem(self._plot_item.getAxis('bottom'))
+        self._plot_item.layout.addItem(self._axisTime, 3, 1)
         self._initial_x_range = 30  # [seconds]
         self.now = self.collector.get_current_time()
         self.view_boxes[0].setXRange(self.now - self._initial_x_range, self.now, padding=0)
@@ -211,9 +241,9 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.btnRemoveAll.clicked.connect(self._remove_all_signals)
         self.ui.btnClearSignal.clicked.connect(self._clear_selected_signal)
         self.ui.btnClearAll.clicked.connect(self._clear_all_signals)
-        self.ui.btnCLoop.clicked.connect(self._prepare_closed_loop)
-        self.ui.btnCurrents.clicked.connect(self._prepare_currents)
-        self.ui.btnTarget.clicked.connect(self._prepare_target)
+        self.ui.btnCLoop.clicked.connect(self._setup_signal_set_closed_loop)
+        self.ui.btnCurrents.clicked.connect(self._setup_signal_set_currents)
+        self.ui.btnTarget.clicked.connect(self._setup_signal_set_target)
         self.ui.btnPause.clicked.connect(self._pause_button_clicked)
         self.ui.btnNow.clicked.connect(self._now_button_clicked)
         self.view_boxes[0].sigResized.connect(self._update_views)
@@ -316,14 +346,12 @@ class OscillaWindow(QtGui.QMainWindow):
     def _clear_selected_signal(self):
         """Remove the visible data for a signal."""
         index = self.ui.lvActiveSig.currentRow()
-        self.curve_items[index].array_time = []
-        self.curve_items[index].array_val = []
+        self.curve_items[index].clear()
 
     def _clear_all_signals(self):
         """Remove the visible data for all signals."""
         for ci in self.curve_items:
-            ci.array_time = []
-            ci.array_val = []
+            ci.clear()
 
     def _shift_button_clicked(self):
         """Assign a curve to a different y axis."""
@@ -365,7 +393,7 @@ class OscillaWindow(QtGui.QMainWindow):
             txtmin = ''
             for ci in self.curve_items:
                 txt1 = "<span style='font-size: 8pt; color: {};'>|".format(ci.color.name())
-                if ci.array_time and ci.array_time[0] < time_value < ci.array_time[-1]:
+                if ci.in_range(time_value):
                     txtmax += "{}{}</span>".format(txt1, ci.val_max)
                     txtnow += "{}{}</span>".format(txt1, ci.get_y(time_value))
                     txtmin += "{}{}</span>".format(txt1, ci.val_min)
@@ -381,7 +409,7 @@ class OscillaWindow(QtGui.QMainWindow):
         """
         self.view_boxes[ci.y_axis - 1].removeItem(ci.curve)
 
-    def _prepare_closed_loop(self):
+    def _setup_signal_set_closed_loop(self):
         """Display a specific set of curves."""
         self._remove_all_signals()
         drv_addr = int(self.ui.cbDrivers.currentText())
@@ -393,7 +421,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self._add_signal(drv_addr, 'StatSettling', 3)
         self._add_signal(drv_addr, 'StatOutofwin', 3)
 
-    def _prepare_currents(self):
+    def _setup_signal_set_currents(self):
         """Display a specific set of curves."""
         self._remove_all_signals()
         drv_addr = int(self.ui.cbDrivers.currentText())
@@ -401,7 +429,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self._add_signal(drv_addr, 'MeasI', 2)
         self._add_signal(drv_addr, 'MeasVm', 3)
 
-    def _prepare_target(self):
+    def _setup_signal_set_target(self):
         """Display a specific set of curves."""
         self._remove_all_signals()
         drv_addr = int(self.ui.cbDrivers.currentText())
@@ -424,19 +452,10 @@ class OscillaWindow(QtGui.QMainWindow):
             self._paused = True
             self.ui.btnPause.setText('Run')
 
-    def callback_plot(self, subscription_id, value_list):
+    def callback_collect(self, subscription_id, value_list):
         for ci in self.curve_items:
             if ci.subscription_id == subscription_id:
-                if not ci.array_val:
-                    ci.val_max = value_list[0][1]
-                    ci.val_min = value_list[0][1]
-                for t, v in value_list:
-                    ci.array_time.append(t)
-                    ci.array_val.append(v)
-                    if v > ci.val_max:
-                        ci.val_max = v
-                    elif v < ci.val_min:
-                        ci.val_min = v
+                ci.collect(value_list)
         if not self._paused:
             self._update_view()
 
