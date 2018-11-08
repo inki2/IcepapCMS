@@ -198,8 +198,8 @@ class OscillaWindow(QtGui.QMainWindow):
         self._axisTime.linkToView(self.view_boxes[0])
         self._plot_item.layout.removeItem(self._plot_item.getAxis('bottom'))
         self._plot_item.layout.addItem(self._axisTime, 3, 1)
-        self._view_last_30_seconds()
         self.now = self.collector.get_current_time()
+        self._view_last_30_seconds()
 
         # Set up the three Y-axes.
         self._plot_item.showAxis('right')
@@ -508,7 +508,7 @@ class OscillaWindow(QtGui.QMainWindow):
         # Update the X-axis.
         x_small = self.view_boxes[0].viewRange()[0][0]
         x_big = self.view_boxes[0].viewRange()[0][1]
-        now_in_range = self.now <= x_big + 0.1
+        now_in_range = self.now <= x_big
         self.now = self.collector.get_current_time()
         if now_in_range:
             self.view_boxes[0].setXRange(self.now - (x_big - x_small), self.now, padding=0)
