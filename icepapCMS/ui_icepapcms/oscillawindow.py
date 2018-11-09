@@ -311,7 +311,7 @@ class OscillaWindow(QtGui.QMainWindow):
 
     def _add_button_clicked(self):
         addr = int(self.ui.cbDrivers.currentText())
-        my_signal_name = self.ui.cbSignals.currentText()
+        my_signal_name = str(self.ui.cbSignals.currentText())
         my_axis = 1
         if self.ui.rbAxis2.isChecked():
             my_axis = 2

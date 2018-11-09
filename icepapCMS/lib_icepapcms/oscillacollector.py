@@ -1,8 +1,8 @@
 from PyQt4.QtCore import QTimer
 from PyQt4.QtCore import QString
 from collections import OrderedDict
-import time
 from pyIcePAP import EthIcePAPController
+import time
 
 
 class Channel:
@@ -51,8 +51,8 @@ class Channel:
         sn = QString(self.sig_name)
         cond_1 = sn.endsWith('Tgtenc')
         cond_2 = sn.endsWith('Shftenc')
-        cond_3 = self.sig_name == 'DifAxMeasure'
-        if not cond_1 and not cond_2 and not cond_3:
+        cond_3 = sn == 'DifAxMeasure'
+        if not (cond_1 or cond_2 or cond_3):
             return
         try:
             cfg = self.axis.get_cfg()
