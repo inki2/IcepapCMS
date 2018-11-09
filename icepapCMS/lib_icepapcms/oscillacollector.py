@@ -1,5 +1,6 @@
 from PyQt4.QtCore import QTimer
 from PyQt4.QtCore import QString
+from collections import OrderedDict
 import time
 from pyIcePAP import EthIcePAPController
 
@@ -7,27 +8,79 @@ from pyIcePAP import EthIcePAPController
 class Channel:
 
     def __init__(self, system, address, signal_name):
+        self.signals = OrderedDict([('PosAxis', self._getter_pos_axis),
+                                    ('PosTgtenc', self._getter_pos_tgtenc),
+                                    ('PosShftenc', self._getter_pos_shftenc),
+                                    ('PosEncin', self._getter_pos_encin),
+                                    ('PosAbsenc', self._getter_pos_absenc),
+                                    ('PosInpos', self._getter_pos_inpos),
+                                    ('PosMotor', self._getter_pos_motor),
+                                    ('PosCtrlenc', self._getter_pos_ctrlenc),
+                                    ('PosMeasure', self._getter_pos_measure),
+                                    ('DifAxMeasure', self._getter_dif_ax_measure),
+                                    ('DifAxMotor', self._getter_dif_ax_motor),
+                                    ('DifAxTgtenc', self._getter_dif_ax_tgtenc),
+                                    ('DifAxShftenc', self._getter_dif_ax_shftenc),
+                                    ('DifAxCtrlenc', self._getter_dif_ax_ctrlenc),
+                                    ('EncEncin', self._getter_enc_encin),
+                                    ('EncAbsenc', self._getter_enc_absenc),
+                                    ('EncTgtenc', self._getter_enc_tgtenc),
+                                    ('EncInpos', self._getter_enc_inpos),
+                                    ('StatReady', self._getter_stat_ready),
+                                    ('StatMoving', self._getter_stat_moving),
+                                    ('StatSettling', self._getter_stat_settling),
+                                    ('StatOutofwin', self._getter_stat_outofwin),
+                                    ('StatStopcode', self._getter_stat_stopcode),
+                                    ('StatWarning', self._getter_stat_warning),
+                                    ('StatLim+', self._getter_stat_limit_positive),
+                                    ('StatLim-', self._getter_stat_limit_negative),
+                                    ('StatHome', self._getter_stat_home),
+                                    ('MeasI', self._getter_meas_i),
+                                    ('MeasIa', self._getter_meas_ia),
+                                    ('MeasIb', self._getter_meas_ib),
+                                    ('MeasVm', self._getter_meas_vm)])
         self.system = system
         self.axis = system[address]
         self.sig_name = signal_name
         self.measure_resolution = 1.
-        self.signal_val_getter = self._set_signal_val_getter(signal_name)
+        self.signal_val_getter = self.signals[signal_name]
         self.collected_samples = []
 
+    def init(self):
+        """Performs some signal dependant checks based on configuration."""
+        sn = QString(self.sig_name)
+        cond_1 = sn.endsWith('Tgtenc')
+        cond_2 = sn.endsWith('Shftenc')
+        cond_3 = self.sig_name == 'DifAxMeasure'
+        if not cond_1 and not cond_2 and not cond_3:
+            return
         try:
             cfg = self.axis.get_cfg()
         except RuntimeError as e:
             msg = 'Failed to retrieve configuration parameters for driver {}\n{}.'.format(self.axis.addr, e)
             raise Exception(msg)
-        sn = QString(self.sig_name)
-        if (sn.endsWith('Tgtenc') and cfg['TGTENC'].upper() == 'NONE') or \
-                (sn.endsWith('Shftenc') and cfg['SHFTENC'].upper() == 'NONE'):
+        if (cond_1 and cfg['TGTENC'].upper() == 'NONE') or (cond_2 and cfg['SHFTENC'].upper() == 'NONE'):
             msg = 'Signal {} is not mapped/valid.'.format(sn)
             raise Exception(msg)
-        if self.sig_name == 'DifAxMeasure':
+        if cond_3:
             self.measure_resolution = self._calc_measure_resolution(cfg)
 
+    def get_signals(self):
+        """
+        Retrieves the available signals.
+
+        Return: List of available signals.
+        """
+        return self.signals.keys()
+
     def equals(self, icepap_addr, signal_name):
+        """
+        Checks for equality.
+
+        icepap_addr - IcePAP address.
+        signal_name - Signal name.
+        Return: True if equal. False otherwise.
+        """
         if icepap_addr != self.axis.addr:
             return False
         if signal_name != self.sig_name:
@@ -80,6 +133,21 @@ class Channel:
     def _getter_pos_measure(self):
         return self.system.get_fpos(self.axis.addr, 'MEASURE')[0]
 
+    def _getter_dif_ax_measure(self):
+        return self._getter_pos_axis() - self._getter_pos_measure() / self.measure_resolution
+
+    def _getter_dif_ax_motor(self):
+        return self._getter_pos_axis() - self._getter_pos_motor()
+
+    def _getter_dif_ax_tgtenc(self):
+        return self._getter_pos_axis() - self._getter_pos_tgtenc()
+
+    def _getter_dif_ax_shftenc(self):
+        return self._getter_pos_axis() - self._getter_pos_shftenc()
+
+    def _getter_dif_ax_ctrlenc(self):
+        return self._getter_pos_axis() - self._getter_pos_ctrlenc()
+
     def _getter_enc_encin(self):
         return self.axis.enc_encin
 
@@ -92,6 +160,9 @@ class Channel:
     def _getter_enc_inpos(self):
         return self.axis.enc_inpos
 
+    def _getter_stat_ready(self):
+        return 1 if self.axis.state_ready else 0
+
     def _getter_stat_moving(self):
         return 1 if self.axis.state_moving else 0
 
@@ -100,9 +171,6 @@ class Channel:
 
     def _getter_stat_outofwin(self):
         return 1 if self.axis.state_outofwin else 0
-
-    def _getter_stat_ready(self):
-        return 1 if self.axis.state_ready else 0
 
     def _getter_stat_stopcode(self):
         return self.axis.state_stop_code
@@ -131,88 +199,6 @@ class Channel:
     def _getter_meas_vm(self):
         return self.axis.meas_vm
 
-    def _getter_dif_ax_measure(self):
-        return self._getter_pos_axis() - self._getter_pos_measure() / self.measure_resolution
-
-    def _getter_dif_ax_motor(self):
-        return self._getter_pos_axis() - self._getter_pos_motor()
-
-    def _getter_dif_ax_tgtenc(self):
-        return self._getter_pos_axis() - self._getter_pos_tgtenc()
-
-    def _getter_dif_ax_shftenc(self):
-        return self._getter_pos_axis() - self._getter_pos_shftenc()
-
-    def _getter_dif_ax_ctrlenc(self):
-        return self._getter_pos_axis() - self._getter_pos_ctrlenc()
-
-    def _set_signal_val_getter(self, sig):
-        if sig == 'PosAxis':
-            return self._getter_pos_axis
-        elif sig == 'PosTgtenc':
-            return self._getter_pos_tgtenc
-        elif sig == 'PosShftenc':
-            return self._getter_pos_shftenc
-        elif sig == 'PosEncin':
-            return self._getter_pos_encin
-        elif sig == 'PosAbsenc':
-            return self._getter_pos_absenc
-        elif sig == 'PosInpos':
-            return self._getter_pos_inpos
-        elif sig == 'PosMotor':
-            return self._getter_pos_motor
-        elif sig == 'PosCtrlenc':
-            return self._getter_pos_ctrlenc
-        elif sig == 'PosMeasure':
-            return self._getter_pos_measure
-        elif sig == 'DifAxMeasure':
-            return self._getter_dif_ax_measure
-        elif sig == 'DifAxMotor':
-            return self._getter_dif_ax_motor
-        elif sig == 'DifAxTgtenc':
-            return self._getter_dif_ax_tgtenc
-        elif sig == 'DifAxShftenc':
-            return self._getter_dif_ax_shftenc
-        elif sig == 'DifAxCtrlenc':
-            return self._getter_dif_ax_ctrlenc
-        elif sig == 'EncEncin':
-            return self._getter_enc_encin
-        elif sig == 'EncAbsenc':
-            return self._getter_enc_absenc
-        elif sig == 'EncTgtenc':
-            return self._getter_enc_tgtenc
-        elif sig == 'EncInpos':
-            return self._getter_enc_inpos
-        elif sig == 'StatMoving':
-            return self._getter_stat_moving
-        elif sig == 'StatSettling':
-            return self._getter_stat_settling
-        elif sig == 'StatOutofwin':
-            return self._getter_stat_outofwin
-        elif sig == 'StatReady':
-            return self._getter_stat_ready
-        elif sig == 'StatStopcode':
-            return self._getter_stat_stopcode
-        elif sig == 'StatWarning':
-            return self._getter_stat_warning
-        elif sig == 'StatLim+':
-            return self._getter_stat_limit_positive
-        elif sig == 'StatLim-':
-            return self._getter_stat_limit_negative
-        elif sig == 'StatHome':
-            return self._getter_stat_home
-        elif sig == 'MeasI':
-            return self._getter_meas_i
-        elif sig == 'MeasIa':
-            return self._getter_meas_ia
-        elif sig == 'MeasIb':
-            return self._getter_meas_ib
-        elif sig == 'MeasVm':
-            return self._getter_meas_vm
-        else:
-            msg = 'Internal error! No function would map to signal {}'.format(sig)
-            raise Exception(msg)
-
 
 class Collector:
 
@@ -235,6 +221,9 @@ class Collector:
             msg = 'IcePAP system {} has no active drivers! Aborting.'.format(self.host)
             raise Exception(msg)
 
+        dummy_channel = Channel(self.icepap_system, 1, 'PosAxis')  # Using dummy values.
+        self.signals = dummy_channel.get_signals()
+
         self.tick_interval = 100  # [milliseconds]
         self.ticker = QTimer()
         self._connect_signals()
@@ -244,10 +233,36 @@ class Collector:
         self.ticker.timeout.connect(self._tick)  # Todo: Fix warning.
 
     def get_available_drivers(self):
+        """
+        Retrieves the available drivers.
+
+        Return: List of available drivers.
+        """
         return self.icepap_system.keys()
+
+    def get_available_signals(self):
+        """
+        Retrieves the available signals.
+
+        Return: List of available signals.
+        """
+        return self.signals
+
+    def get_signal_index(self, signal_name):
+        """
+        Retrieves the fixed index of a signal from its name.
+
+        Return: Signal index.
+        """
+        return self.signals.index(signal_name)
 
     @staticmethod
     def get_current_time():
+        """
+        Retrieves the current time.
+
+        Return: Current time as seconds (with fractions) from 1970.
+        """
         return time.time()
 
     def subscribe(self, icepap_addr, signal_name):
@@ -256,27 +271,38 @@ class Collector:
 
         icepap_addr - IcePAP driver number.
         signal_name - Signal name.
-
         Return - A positive integer id used when unsubscribing.
         """
         for ch in self.channels_subscribed.values():
             if ch.equals(icepap_addr, signal_name):
                 msg = 'Channel already exists.\nAddr: {}\nSignal: {}'.format(icepap_addr, signal_name)
                 raise Exception(msg)
+        channel = Channel(self.icepap_system, icepap_addr, signal_name)
         try:
-            channel = Channel(self.icepap_system, icepap_addr, signal_name)
+            channel.init()
         except Exception as e:
-            msg = 'Failed to create channel.\nAddr: {}\nSignal: {}\n{}'.format(icepap_addr, signal_name, e)
+            msg = 'Failed to initialize new channel.\nAddr: {}\nSignal: {}\n{}'.format(icepap_addr, signal_name, e)
             raise Exception(msg)
         self.channel_id += 1
         self.channels_subscribed[self.channel_id] = channel
         return self.channel_id
 
     def start(self, subscription_id):
+        """
+        Starts collecting data for a subscription.
+
+        subscription_id - The given subscription id.
+        """
         if subscription_id in self.channels_subscribed.keys() and subscription_id not in self.channels_started.keys():
             self.channels_started[subscription_id] = self.channels_subscribed[subscription_id]
 
     def unsubscribe(self, subscription_id):
+        """
+        Cancels a subscription.
+
+        subscription_id - The given subscription id.
+        """
+        """Cancels a subscription."""
         if subscription_id in self.channels_subscribed.keys():
             del self.channels_started[subscription_id]
             del self.channels_subscribed[subscription_id]
@@ -290,7 +316,7 @@ class Collector:
                 if len(channel.collected_samples) >= self.max_buf_len:
                     self.cb(subscription_id, channel.collected_samples)
                     channel.collected_samples = []
-            except RuntimeError as e:  # Todo: Needed?
+            except RuntimeError as e:
                 msg = 'Failed to collect data for signal {}\n{}'.format(channel.sig_name, e)
-                #print(msg)  # Todo: Investigate oscilla shutdown when started from IcePAPcms.
+                print(msg)  # Todo: Investigate oscilla shutdown when started from IcePAPcms.
         self.ticker.start(self.tick_interval)

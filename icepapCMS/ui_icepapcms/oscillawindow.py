@@ -29,41 +29,41 @@ class AxisTime(pg.AxisItem):
 class CurveItem:
     """Represents a curve to be plotted in a diagram."""
 
-    SignalAppearance = namedtuple('SignalAppearance', ['pen_color', 'pen_width', 'pen_style', 'drop_down_list_pos'])
+    SignalAppearance = namedtuple('SignalAppearance', ['pen_color', 'pen_width', 'pen_style'])
 
-    signals = {'PosAxis': SignalAppearance(QtGui.QColor(255, 255, 0), 1, QtCore.Qt.SolidLine, 0),
-               'PosTgtenc': SignalAppearance(QtGui.QColor(255, 0, 0), 1, QtCore.Qt.SolidLine, 1),
-               'PosShftenc': SignalAppearance(QtGui.QColor(0, 255, 0), 1, QtCore.Qt.SolidLine, 2),
-               'PosEncin': SignalAppearance(QtGui.QColor(255, 255, 255), 1, QtCore.Qt.SolidLine, 3),
-               'PosAbsenc': SignalAppearance(QtGui.QColor(51, 153, 255), 1, QtCore.Qt.SolidLine, 4),
-               'PosInpos': SignalAppearance(QtGui.QColor(0, 255, 255), 1, QtCore.Qt.SolidLine, 5),
-               'PosMotor': SignalAppearance(QtGui.QColor(255, 0, 255), 1, QtCore.Qt.SolidLine, 6),
-               'PosCtrlenc': SignalAppearance(QtGui.QColor(204, 153, 102), 1, QtCore.Qt.SolidLine, 7),
-               'PosMeasure': SignalAppearance(QtGui.QColor(0, 0, 255), 1, QtCore.Qt.SolidLine, 8),
-               'DifAxMeasure': SignalAppearance(QtGui.QColor(0, 255, 0), 1, QtCore.Qt.SolidLine, 9),
-               'DifAxMotor': SignalAppearance(QtGui.QColor(255, 204, 0), 1, QtCore.Qt.SolidLine, 10),
-               'DifAxTgtenc': SignalAppearance(QtGui.QColor(153, 255, 153), 3, QtCore.Qt.DotLine, 11),
-               'DifAxShftenc': SignalAppearance(QtGui.QColor(255, 170, 0), 2, QtCore.Qt.DashLine, 12),
-               'DifAxCtrlenc': SignalAppearance(QtGui.QColor(255, 0, 0), 3, QtCore.Qt.DashLine, 13),
-               'EncEncin': SignalAppearance(QtGui.QColor(0, 255, 255), 1, QtCore.Qt.DotLine, 14),
-               'EncAbsenc': SignalAppearance(QtGui.QColor(255, 170, 255), 1, QtCore.Qt.DashLine, 15),
-               'EncTgtenc': SignalAppearance(QtGui.QColor(127, 255, 127), 1, QtCore.Qt.DashLine, 16),
-               'EncInpos': SignalAppearance(QtGui.QColor(255, 255, 127), 1, QtCore.Qt.DashLine, 17),
-               'StatReady': SignalAppearance(QtGui.QColor(255, 0, 0), 5, QtCore.Qt.DotLine, 18),
-               'StatMoving': SignalAppearance(QtGui.QColor(255, 0, 0), 1, QtCore.Qt.DashLine, 19),
-               'StatSettling': SignalAppearance(QtGui.QColor(0, 255, 0), 3, QtCore.Qt.DotLine, 20),
-               'StatOutofwin': SignalAppearance(QtGui.QColor(255, 255, 255), 2, QtCore.Qt.SolidLine, 21),
-               'StatStopcode': SignalAppearance(QtGui.QColor(51, 153, 255), 1, QtCore.Qt.DashLine, 22),
-               'StatWarning': SignalAppearance(QtGui.QColor(255, 0, 255), 1, QtCore.Qt.DashLine, 23),
-               'StatLim+': SignalAppearance(QtGui.QColor(255, 153, 204), 1, QtCore.Qt.DashLine, 24),
-               'StatLim-': SignalAppearance(QtGui.QColor(204, 153, 102), 1, QtCore.Qt.DashLine, 25),
-               'StatHome': SignalAppearance(QtGui.QColor(255, 204, 0), 1, QtCore.Qt.DashLine, 26),
-               'MeasI': SignalAppearance(QtGui.QColor(255, 0, 255), 1, QtCore.Qt.DashLine, 27),
-               'MeasIa': SignalAppearance(QtGui.QColor(255, 153, 204), 1, QtCore.Qt.DashLine, 28),
-               'MeasIb': SignalAppearance(QtGui.QColor(204, 153, 102), 1, QtCore.Qt.DashLine, 29),
-               'MeasVm': SignalAppearance(QtGui.QColor(255, 204, 0), 1, QtCore.Qt.DashLine, 30)}
+    colors = [SignalAppearance(QtGui.QColor(255, 255, 0), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(255, 0, 0), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(0, 255, 0), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(255, 255, 255), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(51, 153, 255), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(0, 255, 255), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(255, 0, 255), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(204, 153, 102), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(0, 0, 255), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(0, 255, 0), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(255, 204, 0), 1, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(153, 255, 153), 2, QtCore.Qt.DotLine),
+              SignalAppearance(QtGui.QColor(255, 170, 0), 2, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(255, 0, 0), 2, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(0, 255, 255), 1, QtCore.Qt.DotLine),
+              SignalAppearance(QtGui.QColor(255, 170, 255), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(127, 255, 127), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(255, 255, 127), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(255, 0, 0), 2, QtCore.Qt.DotLine),
+              SignalAppearance(QtGui.QColor(255, 0, 0), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(0, 255, 0), 2, QtCore.Qt.DotLine),
+              SignalAppearance(QtGui.QColor(255, 255, 255), 2, QtCore.Qt.SolidLine),
+              SignalAppearance(QtGui.QColor(51, 153, 255), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(255, 0, 255), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(255, 153, 204), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(204, 153, 102), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(255, 204, 0), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(255, 0, 255), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(255, 153, 204), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(204, 153, 102), 1, QtCore.Qt.DashLine),
+              SignalAppearance(QtGui.QColor(255, 204, 0), 1, QtCore.Qt.DashLine)]
 
-    def __init__(self, subscription_id, driver_addr, sig_name, y_axis):
+    def __init__(self, subscription_id, driver_addr, sig_name, y_axis, color_idx):
         """
         Initializes an instance of class CurveItem.
 
@@ -79,9 +79,9 @@ class CurveItem:
         self.array_val = []
         self.val_min = 0
         self.val_max = 0
-        sig_vals = self.signals[str(sig_name)]
-        self.color = sig_vals.pen_color
-        self.pen = {'color': sig_vals.pen_color, 'width': sig_vals.pen_width, 'style': sig_vals.pen_style}
+        col_item = self.colors[color_idx]
+        self.color = col_item.pen_color
+        self.pen = {'color': col_item.pen_color, 'width': col_item.pen_width, 'style': col_item.pen_style}
         self.curve = None
         self.lock = Lock()
         self.signature = ''
@@ -243,12 +243,13 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.cbDrivers.setCurrentIndex(start_index)
 
     def _fill_combo_box_signals(self):
-        sig_items = []
-        for sig_name, sig_vals in CurveItem.signals.items():
-            sig_items.append((sig_vals.drop_down_list_pos, sig_name))
-        sig_items.sort()
-        for i in sig_items:
-            self.ui.cbSignals.addItem(i[1])
+        signals = self.collector.get_available_signals()
+        if len(signals) > len(CurveItem.colors):
+            msg = 'Internal error!\nNew signals added.\nAdd more colors and pens.'
+            print(msg)
+            QtGui.QMessageBox.warning(None, 'Add Curve', msg)  # Todo: Fix warning.
+        for sig in signals:
+            self.ui.cbSignals.addItem(sig)
         self.ui.cbSignals.setCurrentIndex(0)
 
     def _connect_signals(self):
@@ -331,9 +332,16 @@ class OscillaWindow(QtGui.QMainWindow):
         except Exception as e:
             msg = 'Failed to add curve.\n{}'.format(e)
             print(msg)
-            QtGui.QMessageBox.critical(None, 'Add Curve', msg)
+            QtGui.QMessageBox.critical(None, 'Add Curve', msg)  # Todo: Fix warning.
             return
-        ci = CurveItem(subscription_id, driver_addr, signal_name, y_axis)
+        try:
+            color_idx = self.collector.get_signal_index(signal_name)
+        except ValueError as e:
+            msg = 'internal error. Failed to retrieve signal index.\n{}'.format(e)
+            print(msg)
+            QtGui.QMessageBox.critical(None, 'Add Curve', msg)  # Todo: Fix warning.
+            return
+        ci = CurveItem(subscription_id, driver_addr, signal_name, y_axis, color_idx)
         self.collector.start(subscription_id)
         self._add_curve(ci)
         self.curve_items.append(ci)
