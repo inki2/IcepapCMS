@@ -122,13 +122,10 @@ class Collector:
             msg = 'IcePAP system {} has no active drivers! Aborting.'.format(self.host)
             raise Exception(msg)
 
-        self.tick_interval = 100  # [milliseconds]
+        self.tick_interval = 10  # [milliseconds]
         self.ticker = QTimer()
-        self._connect_signals()
-        self.ticker.start(self.tick_interval)
-
-    def _connect_signals(self):
         self.ticker.timeout.connect(self._tick)  # Todo: Fix warning.
+        self.ticker.start(self.tick_interval)
 
     def get_available_drivers(self):
         """
