@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'oscilla.ui'
 #
-# Created: Thu Nov  8 13:32:09 2018
+# Created: Mon Nov 12 11:14:32 2018
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -276,7 +276,7 @@ class Ui_OscillaWindow(object):
         OscillaWindow.setWindowTitle(_translate("OscillaWindow", "Dummy Window Title", None))
         self.labelDrivers.setText(_translate("OscillaWindow", "Driver:", None))
         self.labelSignals.setText(_translate("OscillaWindow", "Signal:", None))
-        self.labelAxis.setText(_translate("OscillaWindow", "Axis:", None))
+        self.labelAxis.setText(_translate("OscillaWindow", "Y-axis:", None))
         self.rbAxis1.setText(_translate("OscillaWindow", "1", None))
         self.rbAxis2.setText(_translate("OscillaWindow", "2", None))
         self.rbAxis3.setText(_translate("OscillaWindow", "3", None))

@@ -193,7 +193,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.vloCurves.addWidget(self.plot_widget)
 
         # Set up the X-axis.
-        self._plot_item.getAxis('bottom').hide()  # Hide the old x-axis.
+        self._plot_item.getAxis('bottom').hide()  # Hide the original x-axis.
         self._axisTime = AxisTime(orientation='bottom')  # Create a new X-axis with human readable time labels.
         self._axisTime.linkToView(self.view_boxes[0])
         self._plot_item.layout.removeItem(self._plot_item.getAxis('bottom'))

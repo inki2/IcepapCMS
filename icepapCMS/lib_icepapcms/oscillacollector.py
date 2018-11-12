@@ -110,7 +110,6 @@ class Collector:
         self.channels = {}
         self.channel_id = 0
         self.current_channel = 0
-        self.max_buf_len = 10
         self.sig_list = self.sig_getters.keys()
 
         try:
@@ -123,6 +122,7 @@ class Collector:
             raise Exception(msg)
 
         self.tick_interval = 10  # [milliseconds]
+        self.max_buf_len = 10
         self.ticker = QTimer()
         self.ticker.timeout.connect(self._tick)
         self.ticker.start(self.tick_interval)
