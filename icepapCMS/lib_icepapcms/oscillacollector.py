@@ -124,7 +124,7 @@ class Collector:
 
         self.tick_interval = 10  # [milliseconds]
         self.ticker = QTimer()
-        self.ticker.timeout.connect(self._tick)  # Todo: Fix warning.
+        self.ticker.timeout.connect(self._tick)
         self.ticker.start(self.tick_interval)
 
     def get_available_drivers(self):

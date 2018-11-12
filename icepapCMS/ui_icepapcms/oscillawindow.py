@@ -1,7 +1,7 @@
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 from ui_oscilla import Ui_OscillaWindow
-from lib_icepapcms import Collector  # Todo: Cannot find reference 'Collector' in '__init__.py
+from lib_icepapcms import Collector
 from collections import namedtuple
 from threading import Lock
 import pyqtgraph as pg
@@ -174,7 +174,7 @@ class OscillaWindow(QtGui.QMainWindow):
         except Exception as e:
             msg = 'Failed to create main window.\n{}'.format(e)
             print(msg)
-            QtGui.QMessageBox.critical(None, 'Create Main Window', msg)  # Todo: Fix warning.
+            QtGui.QMessageBox.critical(None, 'Create Main Window', msg)
             return
 
         self.subscriptions = {}
@@ -244,12 +244,16 @@ class OscillaWindow(QtGui.QMainWindow):
 
     def _fill_combo_box_signals(self):
         signals = self.collector.get_available_signals()
-        if len(signals) > len(CurveItem.colors):
+        num_colors = len(CurveItem.colors)
+        if num_colors < len(signals):
             msg = 'Internal error!\nNew signals added.\nAdd more colors and pens.'
             print(msg)
-            QtGui.QMessageBox.warning(None, 'Add Curve', msg)  # Todo: Fix warning.
-        for sig in signals:
-            self.ui.cbSignals.addItem(sig)
+            QtGui.QMessageBox.warning(None, 'Available Signals', msg)
+            for i in range(num_colors):
+                self.ui.cbSignals.addItem(signals[i])
+        else:
+            for sig in signals:
+                self.ui.cbSignals.addItem(sig)
         self.ui.cbSignals.setCurrentIndex(0)
 
     def _connect_signals(self):
@@ -336,14 +340,14 @@ class OscillaWindow(QtGui.QMainWindow):
         except Exception as e:
             msg = 'Failed to add curve.\n{}'.format(e)
             print(msg)
-            QtGui.QMessageBox.critical(None, 'Add Curve', msg)  # Todo: Fix warning.
+            QtGui.QMessageBox.critical(None, 'Add Curve', msg)
             return
         try:
             color_idx = self.collector.get_signal_index(signal_name)
         except ValueError as e:
             msg = 'internal error. Failed to retrieve signal index.\n{}'.format(e)
             print(msg)
-            QtGui.QMessageBox.critical(None, 'Add Curve', msg)  # Todo: Fix warning.
+            QtGui.QMessageBox.critical(None, 'Add Curve', msg)
             return
         ci = CurveItem(subscription_id, driver_addr, signal_name, y_axis, color_idx)
         self.collector.start(subscription_id)
