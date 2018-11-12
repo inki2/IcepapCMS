@@ -218,7 +218,7 @@ class Collector:
                 val = self.sig_getters[channel.sig_name](channel.icepap_address)
             except RuntimeError as e:
                 msg = 'Failed to collect data for signal {}\n{}'.format(channel.sig_name, e)
-                print(msg)  # Todo: Investigate oscilla shutdown when started from IcePAPcms.
+                print(msg)
                 continue
             tv = (time.time(), val)
             channel.collected_samples.append(tv)

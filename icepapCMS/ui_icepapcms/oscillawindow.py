@@ -271,6 +271,10 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.btnNow.clicked.connect(self._goto_now)
         self.view_boxes[0].sigResized.connect(self._update_views)
 
+    def closeEvent(self, event):
+        self._remove_all_signals()
+        event.accept()
+
     def _update_views(self):
         """Updates the geometry of the view boxes."""
         self.view_boxes[1].setGeometry(self.view_boxes[0].sceneBoundingRect())
