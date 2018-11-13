@@ -211,6 +211,7 @@ class OscillaWindow(QtGui.QMainWindow):
         self.view_boxes[1].setXLink(self.view_boxes[0])
         self.view_boxes[2].setXLink(self.view_boxes[0])
         self._plot_item.layout.addItem(self.axes[2], 2, 3)
+        self._plot_item.hideButtons()
 
         self.view_boxes[0].disableAutoRange(axis=self.view_boxes[0].XAxis)
         self.view_boxes[0].enableAutoRange(axis=self.view_boxes[0].YAxis)
