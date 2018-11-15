@@ -121,8 +121,8 @@ class Collector:
             msg = 'IcePAP system {} has no active drivers! Aborting.'.format(self.host)
             raise Exception(msg)
 
-        self.tick_interval = 10  # [milliseconds]
-        self.max_buf_len = 10
+        self.tick_interval = 50  # [milliseconds]
+        self.max_buf_len = 2
         self.ticker = QTimer()
         self.ticker.timeout.connect(self._tick)
         self.ticker.start(self.tick_interval)
