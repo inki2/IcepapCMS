@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>891</width>
-    <height>527</height>
+    <width>892</width>
+    <height>538</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -486,9 +486,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn30sec">
+           <widget class="QPushButton" name="btnResetX">
             <property name="text">
-             <string>30 sec</string>
+             <string>Reset X</string>
             </property>
            </widget>
           </item>
@@ -525,7 +525,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>891</width>
+     <width>892</width>
      <height>20</height>
     </rect>
    </property>
@@ -553,6 +553,9 @@
    <property name="text">
     <string>Exit</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
   </action>
   <action name="actionSettings">
    <property name="text">
@@ -577,6 +580,9 @@
   <action name="actionAdd_Signals">
    <property name="text">
     <string>Add Signals</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>

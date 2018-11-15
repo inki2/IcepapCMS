@@ -4,6 +4,7 @@ from ui_oscilla import Ui_OscillaWindow
 from lib_icepapcms import Collector
 from collections import namedtuple
 from threading import RLock
+from dialogoscillasettings import DialogOscillaSettings
 import pyqtgraph as pg
 import time
 
@@ -89,7 +90,7 @@ class CurveItem:  # Todo: Move to its own file?
 
     def update_signature(self):
         """Sets the new value of the signature string."""
-        self.signature = '{}:{}:{}'.format(self.driver_addr, self.signal_name, self.y_axis)
+        self.signature = '{}:{}:{}'.format(self.driver_addr, self.signal_name, self.y_axis)  # Todo: Chenge font size?
 
     def create_curve(self):
         """Creates a new plot item."""
@@ -219,7 +220,8 @@ class OscillaWindow(QtGui.QMainWindow):
         self._plot_item.layout.removeItem(self._plot_item.getAxis('bottom'))
         self._plot_item.layout.addItem(self._axisTime, 3, 1)
         self.now = self.collector.get_current_time()
-        self._view_last_30_seconds()
+        self.default_len_x_axis = 30
+        self._reset_x()
 
         # Set up the three Y-axes.
         self._plot_item.showAxis('right')
@@ -287,10 +289,15 @@ class OscillaWindow(QtGui.QMainWindow):
         self.ui.btnCurrents.clicked.connect(self._setup_signal_set_currents)
         self.ui.btnTarget.clicked.connect(self._setup_signal_set_target)
         self.ui.btnSeeAll.clicked.connect(self._view_all_data)
-        self.ui.btn30sec.clicked.connect(self._view_last_30_seconds)
+        self.ui.btnResetX.clicked.connect(self._reset_x)
         self.ui.btnResetY.clicked.connect(self._enable_auto_range_y)
         self.ui.btnPause.clicked.connect(self._pause_x_axis)
         self.ui.btnNow.clicked.connect(self._goto_now)
+        self.ui.actionSettings.triggered.connect(self._display_settings_dlg)
+        self.ui.actionExit.triggered.connect(self.close)
+        self.ui.actionClosed_Loop.triggered.connect(self._setup_signal_set_closed_loop)
+        self.ui.actionCurrents.triggered.connect(self._setup_signal_set_currents)
+        self.ui.actionTarget.triggered.connect(self._setup_signal_set_target)
         self.view_boxes[0].sigResized.connect(self._update_views)
 
     def closeEvent(self, event):
@@ -438,13 +445,14 @@ class OscillaWindow(QtGui.QMainWindow):
             txtmax = ''
             txtnow = ''
             txtmin = ''
+            text_size = 10
             for ci in self.curve_items:
-                txt1 = "<span style='font-size: 8pt; color: {};'>|".format(ci.color.name())
+                txt1 = "<span style='font-size: {}pt; color: {};'>|".format(text_size, ci.color.name())
                 if ci.in_range(time_value):
                     txtmax += "{}{}</span>".format(txt1, ci.val_max)
                     txtnow += "{}{}</span>".format(txt1, ci.get_y(time_value))
                     txtmin += "{}{}</span>".format(txt1, ci.val_min)
-            txtnow += "|<span style='font-size: 8pt; color: white;'>{}</span>".format(pretty_time)
+            txtnow += "|<span style='font-size: {}pt; color: white;'>{}</span>".format(text_size, pretty_time)
             self.plot_widget.setTitle("<br>{}<br>{}<br>{}".format(txtmax, txtnow, txtmin))
             self.vertical_line.setPos(mouse_point.x())
 
@@ -492,10 +500,10 @@ class OscillaWindow(QtGui.QMainWindow):
                 time_start = t
         self.view_boxes[0].setXRange(time_start, self.collector.get_current_time(), padding=0)
 
-    def _view_last_30_seconds(self):
-        """Adjust X axis to view the last 30 seconds."""
+    def _reset_x(self):
+        """Reset the length of the X axis to the initial number of seconds (setting)."""
         now = self.collector.get_current_time()
-        self.view_boxes[0].setXRange(now - 30, now, padding=0)
+        self.view_boxes[0].setXRange(now - self.default_len_x_axis, now, padding=0)
 
     def _enable_auto_range_y(self):
         self.view_boxes[0].enableAutoRange(axis=self.view_boxes[0].YAxis)
@@ -517,6 +525,10 @@ class OscillaWindow(QtGui.QMainWindow):
         x_min = self.view_boxes[0].viewRange()[0][0]
         x_max = self.view_boxes[0].viewRange()[0][1]
         self.view_boxes[0].setXRange(now - (x_max - x_min), now, padding=0)
+
+    def _display_settings_dlg(self):
+        dlg = DialogOscillaSettings(self)
+        dlg.show()
 
     def callback_collect(self, subscription_id, value_list):
         """

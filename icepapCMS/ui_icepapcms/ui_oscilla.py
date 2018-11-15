@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'oscilla.ui'
 #
-# Created: Thu Nov 15 07:28:12 2018
+# Created: Thu Nov 15 08:45:19 2018
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_OscillaWindow(object):
     def setupUi(self, OscillaWindow):
         OscillaWindow.setObjectName(_fromUtf8("OscillaWindow"))
-        OscillaWindow.resize(891, 527)
+        OscillaWindow.resize(892, 468)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8("IcepapCfg Icons/gnome-monitor.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         OscillaWindow.setWindowIcon(icon)
@@ -226,9 +226,9 @@ class Ui_OscillaWindow(object):
         self.btnResetY = QtGui.QPushButton(self.centralwidget)
         self.btnResetY.setObjectName(_fromUtf8("btnResetY"))
         self.hloCurveButtons.addWidget(self.btnResetY)
-        self.btn30sec = QtGui.QPushButton(self.centralwidget)
-        self.btn30sec.setObjectName(_fromUtf8("btn30sec"))
-        self.hloCurveButtons.addWidget(self.btn30sec)
+        self.btnResetX = QtGui.QPushButton(self.centralwidget)
+        self.btnResetX.setObjectName(_fromUtf8("btnResetX"))
+        self.hloCurveButtons.addWidget(self.btnResetX)
         self.btnNow = QtGui.QPushButton(self.centralwidget)
         self.btnNow.setObjectName(_fromUtf8("btnNow"))
         self.hloCurveButtons.addWidget(self.btnNow)
@@ -239,7 +239,7 @@ class Ui_OscillaWindow(object):
         self.gridLayout.addLayout(self.hloAll, 0, 0, 1, 1)
         OscillaWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(OscillaWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 891, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 892, 20))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
@@ -293,14 +293,16 @@ class Ui_OscillaWindow(object):
         self.btnSeeAll.setShortcut(_translate("OscillaWindow", "Ctrl+S", None))
         self.btnPause.setText(_translate("OscillaWindow", "Pause", None))
         self.btnResetY.setText(_translate("OscillaWindow", "Reset Y", None))
-        self.btn30sec.setText(_translate("OscillaWindow", "30 sec", None))
+        self.btnResetX.setText(_translate("OscillaWindow", "Reset X", None))
         self.btnNow.setText(_translate("OscillaWindow", "Now", None))
         self.menuFile.setTitle(_translate("OscillaWindow", "File", None))
         self.menuSignal_Sets.setTitle(_translate("OscillaWindow", "Signal Sets", None))
         self.actionExit.setText(_translate("OscillaWindow", "Exit", None))
+        self.actionExit.setShortcut(_translate("OscillaWindow", "Ctrl+X", None))
         self.actionSettings.setText(_translate("OscillaWindow", "Settings", None))
         self.actionClosed_Loop.setText(_translate("OscillaWindow", "Closed Loop", None))
         self.actionCurrents.setText(_translate("OscillaWindow", "Currents", None))
         self.actionTarget.setText(_translate("OscillaWindow", "Target", None))
         self.actionAdd_Signals.setText(_translate("OscillaWindow", "Add Signals", None))
+        self.actionAdd_Signals.setShortcut(_translate("OscillaWindow", "Ctrl+A", None))
 
