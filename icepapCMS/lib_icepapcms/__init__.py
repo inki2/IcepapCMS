@@ -6,5 +6,6 @@ from configmanager import ConfigManager
 from timer import Timer
 from icepapcontroller import *
 from oscillacollector import Collector
+from oscillasettings import OscillaSettings
 from pyIcePAP import *
 from IPy import *

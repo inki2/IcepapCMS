@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>429</height>
+    <width>601</width>
+    <height>395</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,13 +20,13 @@
    <string>Oscilloscope Settings</string>
   </property>
   <property name="modal">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <widget class="QDialogButtonBox" name="bbOscillaSettings">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>380</y>
+     <x>100</x>
+     <y>350</y>
      <width>171</width>
      <height>32</height>
     </rect>
@@ -41,8 +41,8 @@
   <widget class="QGroupBox" name="gbSampling">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
+     <x>50</x>
+     <y>20</y>
      <width>391</width>
      <height>181</height>
     </rect>
@@ -59,30 +59,36 @@
       <height>24</height>
      </rect>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
     <property name="prefix">
      <string/>
     </property>
     <property name="minimum">
-     <number>10</number>
+     <number>1</number>
     </property>
     <property name="maximum">
-     <number>1000</number>
+     <number>2</number>
     </property>
     <property name="singleStep">
-     <number>10</number>
+     <number>1</number>
     </property>
     <property name="value">
-     <number>50</number>
+     <number>2</number>
     </property>
    </widget>
    <widget class="QSpinBox" name="sbDumpRate">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>260</x>
       <y>80</y>
       <width>71</width>
       <height>24</height>
      </rect>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
     <property name="minimum">
      <number>1</number>
@@ -94,7 +100,7 @@
      <number>2</number>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="labelSampleRate">
     <property name="geometry">
      <rect>
       <x>18</x>
@@ -107,10 +113,10 @@
      <string>Sample Rate [ms between samples]</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="labelDumpRate">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>40</x>
       <y>80</y>
       <width>211</width>
       <height>20</height>
@@ -120,11 +126,11 @@
      <string>GUI Dump Rate [samples/dump]</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
+   <widget class="QLabel" name="labelGuiRate">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>140</y>
+      <x>70</x>
+      <y>150</y>
       <width>221</width>
       <height>16</height>
      </rect>
@@ -153,7 +159,7 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>180</x>
      <y>220</y>
      <width>391</width>
      <height>71</height>
@@ -162,7 +168,7 @@
    <property name="title">
     <string>X-axis</string>
    </property>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="labelXAxisLength">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -172,57 +178,34 @@
      </rect>
     </property>
     <property name="text">
-     <string>Default length [seconds]</string>
+     <string>Default/Reset Length [seconds]</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="spLenAxisX">
+   <widget class="QSpinBox" name="sbLenAxisX">
     <property name="geometry">
      <rect>
-      <x>296</x>
+      <x>240</x>
       <y>30</y>
       <width>71</width>
       <height>24</height>
      </rect>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
     <property name="minimum">
-     <number>10</number>
+     <number>1</number>
     </property>
     <property name="maximum">
-     <number>3600</number>
+     <number>2</number>
     </property>
     <property name="singleStep">
-     <number>10</number>
+     <number>1</number>
     </property>
     <property name="value">
-     <number>30</number>
+     <number>2</number>
     </property>
    </widget>
-  </widget>
-  <widget class="QPushButton" name="btnOK">
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>360</y>
-     <width>80</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>OK</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btnCancel">
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>390</y>
-     <width>80</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cancel</string>
-   </property>
   </widget>
  </widget>
  <resources/>

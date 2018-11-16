@@ -12,7 +12,7 @@ class _Channel:
         """
         Initializes an instance of class _Channel.
 
-        address - IcePAP driver id.
+        address     - IcePAP driver id.
         signal_name - Signal name.
         """
         self.icepap_address = address
@@ -62,14 +62,14 @@ class Collector:
 
     def __init__(self, host, port, callback):
         """
-        Initializes an instance of class _Channel.
+        Initializes an instance of class Collector.
 
-        host - The IcePAP system host name.
-        port - The IcePAP system port number.
+        host     - The IcePAP system host name.
+        port     - The IcePAP system port number.
         callback - A callback function used for sending collected signal data back to the caller.
                    cb_func(subscription_id, value_list)
                        subscription_id - The subscription id retained when subscribing for a signal.
-                       value_list - A list of tuples (time_stamp, signal_value)
+                       value_list      - A list of tuples (time_stamp, signal_value)
         """
         self.sig_getters = OrderedDict([('PosAxis', self._getter_pos_axis),
                                         ('PosTgtenc', self._getter_pos_tgtenc),
@@ -121,8 +121,12 @@ class Collector:
             msg = 'IcePAP system {} has no active drivers! Aborting.'.format(self.host)
             raise Exception(msg)
 
+        self.tick_interval_min = 10  # [milliseconds]
+        self.tick_interval_max = 1000  # [milliseconds]
         self.tick_interval = 50  # [milliseconds]
-        self.max_buf_len = 2
+        self.sample_buf_len_min = 1
+        self.sample_buf_len_max = 100
+        self.sample_buf_len = 2
         self.ticker = QTimer()
         self.ticker.timeout.connect(self._tick)
         self.ticker.start(self.tick_interval)
@@ -222,7 +226,7 @@ class Collector:
                 continue
             tv = (time.time(), val)
             channel.collected_samples.append(tv)
-            if len(channel.collected_samples) >= self.max_buf_len:
+            if len(channel.collected_samples) >= self.sample_buf_len:
                 self.cb(subscription_id, channel.collected_samples)
                 channel.collected_samples = []
         self.ticker.start(self.tick_interval)
